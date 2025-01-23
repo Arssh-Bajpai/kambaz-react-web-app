@@ -204,6 +204,6 @@ Please
 to get dummy text<br/>
 <div>
 <a href="https://github.com/Arssh-Bajpai/kambaz-react-web-app" id="source code">click here</a>
-to get dummy text<br/>
+to go to source repository<br/>
 </div>
   </div>);}
