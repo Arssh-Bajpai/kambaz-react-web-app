@@ -1,13 +1,63 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { AiOutlineDashboard } from "react-icons/ai";
+import { IoCalendarOutline } from "react-icons/io5";
+import { LiaBookSolid, LiaCogSolid } from "react-icons/lia";
+import { FaInbox, FaRegCircleUser } from "react-icons/fa6";
+
 export default function KambazNavigation() {
+  const location = useLocation(); // Get current route for active link styling
+
   return (
-    <div id="wd-kambaz-navigation">
-      <a href="https://www.northeastern.edu/" id="wd-neu-link" target="_blank">Northeastern</a><br/>
-      <Link to="/Kambaz/Account" id="wd-account-link">Account</Link><br/>
-      <Link to="/Kambaz/Dashboard" id="wd-dashboard-link">Dashboard</Link><br/>
-      <Link to="/Kambaz/Dashboard" id="wd-course-link">Courses</Link><br/>
-      <Link to="/Kambaz/Calendar" id="wd-calendar-link">Calendar</Link><br/>
-      <Link to="/Kambaz/Inbox" id="wd-inbox-link">Inbox</Link><br/>
-      <Link to="/Labs" id="wd-labs-link">Labs</Link><br/>
+    <div id="wd-kambaz-navigation" className="list-group rounded-0 position-fixed bottom-0 top-0 d-none d-md-block bg-black z-2">
+      
+      {/* Northeastern University Logo */}
+      <a id="wd-neu-link" target="_blank" href="https://www.northeastern.edu/"
+         className="list-group-item bg-black border-0 text-center text-white">
+        <img src="/images/NEU.png" width="75px" alt="Northeastern University Logo" />
+      </a>
+
+      {/* Account */}
+      <Link to="/Kambaz/Account"
+            className={`list-group-item text-center border-0 bg-black text-white ${location.pathname === "/Kambaz/Account" ? "active-link" : ""}`}>
+        <FaRegCircleUser className="fs-1" /><br />
+        Account
+      </Link>
+
+      {/* Dashboard */}
+      <Link to="/Kambaz/Dashboard"
+            className={`list-group-item text-center border-0 ${location.pathname.startsWith("/Kambaz/Dashboard") ? "active-link" : "inactive-link"}`}>
+        <AiOutlineDashboard className="fs-1" /><br />
+        Dashboard
+      </Link>
+
+      {/* Courses (Fixed Route) */}
+      <Link to="/Kambaz/Courses"
+            className={`list-group-item text-center border-0 bg-black text-white ${location.pathname.startsWith("/Kambaz/Courses") ? "active-link" : ""}`}>
+        <LiaBookSolid className="fs-1 text-danger" /><br />
+        Courses
+      </Link>
+
+      {/* Calendar */}
+      <Link to="/Kambaz/Calendar"
+            className={`list-group-item text-center border-0 bg-black text-white ${location.pathname.startsWith("/Kambaz/Calendar") ? "active-link" : ""}`}>
+        <IoCalendarOutline className="fs-1 text-danger" /><br />
+        Calendar
+      </Link>
+
+      {/* Inbox */}
+      <Link to="/Kambaz/Inbox"
+            className={`list-group-item text-center border-0 bg-black text-white ${location.pathname.startsWith("/Kambaz/Inbox") ? "active-link" : ""}`}>
+        <FaInbox className="fs-1 text-danger" /><br />
+        Inbox
+      </Link>
+
+      {/* Labs */}
+      <Link to="/Labs"
+            className={`list-group-item text-center border-0 bg-black text-white ${location.pathname.startsWith("/Labs") ? "active-link" : ""}`}>
+        <LiaCogSolid className="fs-1 text-danger" /><br />
+        Labs
+      </Link>
+
     </div>
-);}
+  );
+}

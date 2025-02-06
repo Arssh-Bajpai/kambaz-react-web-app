@@ -9,6 +9,7 @@ export default function App() {
      <Route path="/" element={<Navigate to="Kambaz"/>}/>
      <Route path="/Labs/*" element={<Labs />} />
      <Route path="/Kambaz/*" element={<Kambaz />} />
+     <Route path=""/>
     </Routes>
    </div>
   </HashRouter>
