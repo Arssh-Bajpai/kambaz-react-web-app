@@ -32,7 +32,7 @@ export default function Dashboard() {
                   </Card.Body>
                 </Link>
                 <div className="text-center mb-3">
-                  <Button as={Link} to={`/Kambaz/Courses/${course.id}/Home`} variant="primary">Go</Button>
+                  {/* <Button as={Link} to={`/Kambaz/Courses/${course.id}/Home`} variant="primary">Go</Button> */}
                 </div>
               </Card>
             </Col>

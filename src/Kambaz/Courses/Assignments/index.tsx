@@ -1,17 +1,18 @@
 import { Link } from "react-router-dom";
+import { ListGroup } from "react-bootstrap";
 
 export default function Assignments() {
   return (
-    <div>
-      <h2>Assignments</h2>
-      <ul className="list-group">
-        <li className="list-group-item">
-          <Link to="A1">Assignment 1</Link>
-        </li>
-        <li className="list-group-item">
-          <Link to="A2">Assignment 2</Link>
-        </li>
-      </ul>
+    <div id="wd-assignments">
+      <h2 className="text-danger">Assignments</h2>
+      <ListGroup>
+        <ListGroup.Item>
+          <Link to="A1" className="text-decoration-none">Assignment 1</Link>
+        </ListGroup.Item>
+        <ListGroup.Item>
+          <Link to="A2" className="text-decoration-none">Assignment 2</Link>
+        </ListGroup.Item>
+      </ListGroup>
     </div>
   );
 }
