@@ -1,27 +1,12 @@
-import { Form, Button } from "react-bootstrap";
+import { useParams } from "react-router-dom";
 
 export default function AssignmentEditor() {
+  const { aid } = useParams();
+
   return (
-    <div>
-      <h2>Edit Assignment</h2>
-      <Form>
-        <Form.Group>
-          <Form.Label>Assignment Name</Form.Label>
-          <Form.Control type="text" placeholder="Enter assignment name" />
-        </Form.Group>
-
-        <Form.Group>
-          <Form.Label>Description</Form.Label>
-          <Form.Control as="textarea" rows={3} placeholder="Enter description" />
-        </Form.Group>
-
-        <Form.Group>
-          <Form.Label>Points</Form.Label>
-          <Form.Control type="number" placeholder="100" />
-        </Form.Group>
-
-        <Button variant="primary" className="mt-3">Save</Button>
-      </Form>
+    <div className="wd-assignment-editor">
+      <h2>Assignment {aid}</h2>
+      <p>Edit the details of this assignment.</p>
     </div>
   );
 }

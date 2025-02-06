@@ -1,75 +1,38 @@
-/* Ensure sidebar does not overlap main content */
-@media (min-width: 768px) {
-  #wd-kambaz .wd-main-content-offset {
-    padding-left: 140px !important;
-  }
-}
-
-/* Fix main content area */
+/* Assignments Page Layout */
 .wd-main-content {
-  padding-left: 160px; /* Adjusted for sidebar */
-  padding-right: 20px; /* Prevents right-side clipping */
-  min-width: calc(100vw - 160px);
-  overflow-x: hidden;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
+  margin-left: 140px;
+  padding: 30px;
+  max-width: 800px; /* Adjust width for better readability */
 }
 
-/* Fix Course Layout so it doesn’t push into the Sidebar */
-.wd-course-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: space-between;
+/* Sidebar Stays Fixed */
+#wd-kambaz-navigation {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 120px;
+  background-color: black;
+  z-index: 100;
 }
 
-/* Ensure Course Status Panel Stays Fixed & Doesn't Clip */
-.wd-course-status {
-  width: 350px;
-  max-width: 100%;
-  flex-shrink: 0;
-  position: relative;
-  right: 0;
+/* Form Field Styling */
+form {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
 }
 
-/* Fix Module Controls Layout */
-.wd-module-controls {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 10px;
+form p {
+  font-size: 14px;
+  margin-bottom: 10px;
 }
 
-/* Ensure Module Buttons Don't Overflow */
-.wd-module-controls .btn {
-  white-space: nowrap;
+form ul {
+  padding-left: 20px;
 }
 
-/* Fix Home Dropdown Menu Clipping */
-.dropdown-menu {
-  z-index: 1050; /* Ensures dropdown stays on top */
+/* Buttons Styling */
+button {
+  width: 100px;
 }
-
-/* Prevent Publish and Module buttons from getting clipped */
-.wd-publish-module-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-/* Ensure Course Navigation and Status Panel Align Properly */
-.wd-course-navigation {
-  min-width: 250px;
-  flex-shrink: 0;
-}
-
-/* Fix Status Panel Alignment */
-@media (max-width: 1200px) {
-  .wd-course-status {
-    width: 100%;
-    margin-top: 20px;
-  }
-}
-
-
