@@ -1,31 +1,68 @@
-body { margin: 0;  padding: 0; }
-body * { font-family:
-         Arial, Helvetica, 
-         sans-serif; }
-@media (min-width: 768px) {
-  #wd-kambaz .wd-main-content-offset {
-    padding-left: 140px !important;
+/* Ensure the sidebar stays fixed */
+#wd-kambaz-navigation {
+    width: 120px;
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    background-color: black;
+    z-index: 2;
   }
-}
-
-.btn-secondary {
-  --bs-btn-color: #000 !important;
-  --bs-btn-bg: #c7cdd1 !important;
-  --bs-btn-border-color: #c7cdd1 !important;
-  --bs-btn-hover-color: #fff !important;
-}
-.bg-secondary {
-  --bs-secondary-rgb: 199, 205, 209;
-}
-.list-group-item {
-  --bs-list-group-border-color: gray;
-}
-.wd-lesson {
-  border-left: 3px solid green !important;
-}
-/* Fixes main content overlapping with sidebar */
-.wd-main-content {
-    margin-left: 120px; /* Same width as sidebar */
-    padding: 20px; /* Adds spacing */
+  
+  /* Offset main content to avoid overlap */
+  @media (min-width: 768px) {
+    .wd-main-content-offset {
+      padding-left: 140px !important;
+    }
   }
+  
+  /* Course Navigation Sidebar */
+  #wd-course-navigation {
+    background-color: white;
+    padding: 15px;
+    border-right: 1px solid #ccc;
+    min-height: 100vh;
+  }
+  
+  #wd-course-navigation .list-group-item {
+    font-size: 1.1rem;
+    padding: 10px;
+    text-align: left;
+    background-color: white;
+    color: red;
+    border: none;
+  }
+  
+  #wd-course-navigation .list-group-item.active {
+    background-color: white;
+    color: black;
+    border-left: 3px solid black;
+  }
+  
+  /* Ensure Course Modules and Status align properly */
+  #wd-course-content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 20px;
+  }
+  
+  #wd-modules {
+    flex-grow: 1;
+    max-width: 70%;
+    min-width: 60%;
+  }
+  
+  #wd-course-status {
+    width: 25%;
+    min-width: 250px;
+  }
+  
+  /* Responsive Design: Hide Course Status on Small Screens */
+  @media (max-width: 992px) {
+    #wd-course-status {
+      display: none;
+    }
+  }
+  
   

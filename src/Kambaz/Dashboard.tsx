@@ -13,30 +13,32 @@ const courses = [
 
 export default function Dashboard() {
   return (
-    <Container fluid className="wd-main-content">
+    <Container fluid style={{ marginLeft: "160px", padding: "20px" }}> {/* ✅ Fix Clipping */}
       <h1 id="wd-dashboard-title" className="mt-3">Dashboard</h1> 
       <hr />
       <h2 id="wd-dashboard-published" className="mt-3">Published Courses ({courses.length})</h2> 
       <hr />
 
-      <Row xs={1} md={4} className="g-4">
-        {courses.map((course) => (
-          <Col key={course.id} style={{ minWidth: "250px", maxWidth: "270px", textAlign: "center" }}>
-            <Card className="shadow-sm">
-              <Link to={`/Kambaz/Courses/${course.id}/Home`} className="text-decoration-none">
-                <Card.Img variant="top" src={course.img} width="100%" height={160} />
-                <Card.Body>
-                  <Card.Title className="text-dark">{course.title}</Card.Title>
-                  <Card.Text className="text-muted">{course.desc}</Card.Text>
-                </Card.Body>
-              </Link>
-              <div className="text-center mb-3">
-                <Button as={Link} to={`/Kambaz/Courses/${course.id}/Home`} variant="primary">Go</Button>
-              </div>
-            </Card>
-          </Col>
-        ))}
-      </Row>
+      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "flex-start", gap: "20px" }}> {/* ✅ Fix Grid */}
+        <Row xs={1} md={4} className="g-4">
+          {courses.map((course) => (
+            <Col key={course.id} style={{ minWidth: "250px", maxWidth: "270px", textAlign: "center" }}>
+              <Card className="shadow-sm">
+                <Link to={`/Kambaz/Courses/${course.id}/Home`} className="text-decoration-none">
+                  <Card.Img variant="top" src={course.img} width="100%" height={160} />
+                  <Card.Body>
+                    <Card.Title className="text-dark">{course.title}</Card.Title>
+                    <Card.Text className="text-muted">{course.desc}</Card.Text>
+                  </Card.Body>
+                </Link>
+                <div className="text-center mb-3">
+                  <Button as={Link} to={`/Kambaz/Courses/${course.id}/Home`} variant="primary">Go</Button>
+                </div>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      </div>
     </Container>
   );
 }

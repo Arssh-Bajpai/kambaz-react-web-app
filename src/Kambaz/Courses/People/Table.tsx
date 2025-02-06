@@ -1,23 +1,36 @@
 import { Table } from "react-bootstrap";
 import { FaUserCircle } from "react-icons/fa";
+
 export default function PeopleTable() {
- return (
-  <div id="wd-people-table">
-   <Table striped>
-    <thead>
-     <tr><th>Name</th><th>Login ID</th><th>Section</th><th>Role</th><th>Last Activity</th><th>Total Activity</th></tr>
-    </thead>
-    <tbody>
-     <tr><td className="wd-full-name text-nowrap">
-          <FaUserCircle className="me-2 fs-1 text-secondary" />
-          <span className="wd-first-name">Tony</span>{" "}
-          <span className="wd-last-name">Stark</span></td>
-      <td className="wd-login-id">001234561S</td>
-      <td className="wd-section">S101</td>
-      <td className="wd-role">STUDENT</td>
-      <td className="wd-last-activity">2020-10-01</td>
-      <td className="wd-total-activity">10:21:32</td></tr>
-          {/* Add at least 3 more users such as Bruce Wayne, Steve Rogers, and Natasha Romanoff */}
-    </tbody>
-   </Table>
-  </div> );}
+  return (
+    <div>
+      <h2>People</h2>
+      <Table striped>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Role</th>
+            <th>Email</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><FaUserCircle className="me-2" /> Tony Stark</td>
+            <td>Student</td>
+            <td>tony@avengers.com</td>
+          </tr>
+          <tr>
+            <td><FaUserCircle className="me-2" /> Bruce Wayne</td>
+            <td>TA</td>
+            <td>bruce@wayne.com</td>
+          </tr>
+          <tr>
+            <td><FaUserCircle className="me-2" /> Natasha Romanoff</td>
+            <td>Professor</td>
+            <td>natasha@shield.com</td>
+          </tr>
+        </tbody>
+      </Table>
+    </div>
+  );
+}
