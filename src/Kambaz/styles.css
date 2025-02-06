@@ -1,43 +1,75 @@
-body {
-  margin: 0;
-  padding: 0;
-}
-
-body * {
-  font-family: Arial, Helvetica, sans-serif;
-}
-
+/* Ensure sidebar does not overlap main content */
 @media (min-width: 768px) {
   #wd-kambaz .wd-main-content-offset {
     padding-left: 140px !important;
   }
 }
 
-.wd-courses-navigation {
-  width: 250px;
+/* Fix main content area */
+.wd-main-content {
+  padding-left: 160px; /* Adjusted for sidebar */
+  padding-right: 20px; /* Prevents right-side clipping */
+  min-width: calc(100vw - 160px);
+  overflow-x: hidden;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
 }
 
+/* Fix Course Layout so it doesn’t push into the Sidebar */
+.wd-course-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: space-between;
+}
+
+/* Ensure Course Status Panel Stays Fixed & Doesn't Clip */
 .wd-course-status {
   width: 350px;
+  max-width: 100%;
+  flex-shrink: 0;
+  position: relative;
+  right: 0;
 }
 
-.list-group.wd > .list-group-item.active {
-  color: black;
-  background-color: white;
-  border-left: 3px solid black !important;
+/* Fix Module Controls Layout */
+.wd-module-controls {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
-.btn-secondary {
-  --bs-btn-color: #000 !important;
-  --bs-btn-bg: #c7cdd1 !important;
-  --bs-btn-border-color: #c7cdd1 !important;
-  --bs-btn-hover-color: #fff !important;
+/* Ensure Module Buttons Don't Overflow */
+.wd-module-controls .btn {
+  white-space: nowrap;
 }
 
-.bg-secondary {
-  --bs-secondary-rgb: 199, 205, 209;
+/* Fix Home Dropdown Menu Clipping */
+.dropdown-menu {
+  z-index: 1050; /* Ensures dropdown stays on top */
 }
 
-.list-group-item {
-  --bs-list-group-border-color: gray;
+/* Prevent Publish and Module buttons from getting clipped */
+.wd-publish-module-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
+
+/* Ensure Course Navigation and Status Panel Align Properly */
+.wd-course-navigation {
+  min-width: 250px;
+  flex-shrink: 0;
+}
+
+/* Fix Status Panel Alignment */
+@media (max-width: 1200px) {
+  .wd-course-status {
+    width: 100%;
+    margin-top: 20px;
+  }
+}
+
+
