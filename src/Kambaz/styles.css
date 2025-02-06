@@ -1,38 +1,251 @@
-/* Assignments Page Layout */
-.wd-main-content {
-  margin-left: 140px;
-  padding: 30px;
-  max-width: 800px; /* Adjust width for better readability */
-}
-
-/* Sidebar Stays Fixed */
+/* Ensure Sidebar is Fixed */
 #wd-kambaz-navigation {
+  width: 120px;  /* Sidebar width */
   position: fixed;
   top: 0;
   bottom: 0;
   left: 0;
-  width: 120px;
   background-color: black;
-  z-index: 100;
+  z-index: 10;
 }
 
-/* Form Field Styling */
-form {
-  background: white;
+/* Push Main Content to the Right */
+.wd-main-content {
+  flex-grow: 1;
+  margin-left: 140px; /* Pushes the content past the sidebar */
+  padding: 20px; /* Adds spacing */
+  width: calc(100% - 140px); /* Ensures it fits full page */
+}
+
+/* Course Content Should Stretch to Fit */
+#wd-courses {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+/* Right Sidebar Navigation */
+.wd-course-navigation {
+  width: 250px; /* Adjusted for proper layout */
+  margin-left: auto; /* Push to far right */
+}
+/* --- Centering and Layout --- */
+.wd-account-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100vh;
+  padding: 0 50px; /* Adjusted spacing */
+}
+
+/* --- Left Sidebar --- */
+.wd-sidebar-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 140px;
+  height: 100%;
+  background-color: black;
+  color: white;
   padding: 20px;
+}
+
+/* --- Centered Sign-in, Signup, and Profile Forms --- */
+.wd-signin-wrapper, .wd-signup-wrapper, .wd-profile-wrapper {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin-left: 150px; /* Pushes away from sidebar */
+}
+
+.wd-signin-box, .wd-signup-box, .wd-profile-box {
+  background: white;
+  padding: 30px;
   border-radius: 8px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  width: 350px;
+  text-align: center;
 }
 
-form p {
-  font-size: 14px;
+/* --- Profile Layout --- */
+.wd-profile-box input {
+  width: 100%;
   margin-bottom: 10px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
 }
 
-form ul {
-  padding-left: 20px;
+/* --- Signup and Signin Buttons --- */
+.wd-signin-btn, .wd-signup-btn {
+  width: 100%;
+  padding: 10px;
+  border-radius: 4px;
 }
 
-/* Buttons Styling */
-button {
-  width: 100px;
+/* --- Right Sidebar for Navigation --- */
+.wd-account-sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 180px;
+  height: 100%;
+  background-color: white;
+  padding: 20px;
+  border-left: 2px solid #ddd;
+}
+
+/* Sidebar Links */
+.wd-account-menu {
+  list-style: none;
+  padding: 0;
+}
+
+.wd-account-link {
+  color: black;
+  text-decoration: none;
+  display: block;
+  padding: 10px 0;
+}
+
+.wd-account-link:hover {
+  text-decoration: underline;
+}
+/* --- Centering and Layout --- */
+.wd-account-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100vh;
+  padding: 0 50px; /* Adjusted spacing */
+}
+
+/* --- Left Sidebar --- */
+.wd-sidebar-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 140px;
+  height: 100%;
+  background-color: black;
+  color: white;
+  padding: 20px;
+}
+
+/* --- Centered Sign-in, Signup, and Profile Forms --- */
+.wd-signin-wrapper, .wd-signup-wrapper, .wd-profile-wrapper {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin-left: 150px; /* Pushes away from sidebar */
+}
+
+.wd-signin-box, .wd-signup-box, .wd-profile-box {
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  width: 350px;
+  text-align: center;
+}
+
+/* --- Profile Layout --- */
+.wd-profile-box input {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+/* --- Signup and Signin Buttons --- */
+.wd-signin-btn, .wd-signup-btn {
+  width: 100%;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+/* --- Right Sidebar for Navigation --- */
+.wd-account-sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 180px;
+  height: 100%;
+  background-color: white;
+  padding: 20px;
+  border-left: 2px solid #ddd;
+}
+
+/* Sidebar Links */
+.wd-account-menu {
+  list-style: none;
+  padding: 0;
+}
+
+.wd-account-link {
+  color: black;
+  text-decoration: none;
+  display: block;
+  padding: 10px 0;
+}
+
+.wd-account-link:hover {
+  text-decoration: underline;
+}
+.wd-account-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+.wd-account-layout {
+  display: flex;
+  width: 100%;
+}
+
+.wd-account-sidebar {
+  width: 200px;
+  padding: 20px;
+  background-color: #f8f9fa;
+}
+
+.wd-account-content {
+  flex-grow: 1;
+  padding: 20px;
+}
+/* Center Signup Box */
+.wd-signup-box {
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  width: 350px;
+}
+
+/* Title Styling */
+.wd-signup-title {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+/* Signup Button */
+.wd-signup-btn {
+  font-size: 18px;
+  padding: 10px;
+}
+
+/* Signin Link */
+.wd-signin-link {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.wd-signin-link:hover {
+  text-decoration: underline;
 }
