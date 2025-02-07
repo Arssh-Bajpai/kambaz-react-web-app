@@ -22,15 +22,16 @@ export default function Dashboard() {
       <Row xs={1} md={4} className="g-4">
         {courses.map((course) => (
           <Col key={course.id} xs={12} sm={6} md={4} lg={3}>
-            <Card as="div" className="shadow-sm">
-              <Link to={`/Kambaz/Courses/${course.id}/Home`} as={Link as unknown as React.ElementType} className="text-decoration-none">
+            {/* ✅ Fix: Wrap the entire Card inside the Link */}
+            <Link to={`/Kambaz/Courses/${course.id}/Home`} className="text-decoration-none">
+              <Card className="shadow-sm">
                 <Card.Img variant="top" src={course.img} style={{ width: "100%", height: "160px" }} />
                 <Card.Body>
                   <Card.Title className="text-dark">{course.title}</Card.Title>
                   <Card.Text className="text-muted">{course.desc}</Card.Text>
                 </Card.Body>
-              </Link>
-            </Card>
+              </Card>
+            </Link>
           </Col>
         ))}
       </Row>
