@@ -1,19 +1,34 @@
-import { Link } from "react-router-dom";
+import { Form, Button, Container } from "react-bootstrap";
+
 export default function Profile() {
   return (
-    <div id="wd-profile-screen">
-      <h3>Profile</h3>
-      <input defaultValue="alice" placeholder="username" className="wd-username"/><br/>
-      <input defaultValue="123"   placeholder="password" type="password"
-             className="wd-password" /><br/>
-      <input defaultValue="Alice" placeholder="First Name" id="wd-firstname" /><br/>
-      <input defaultValue="Wonderland" placeholder="Last Name" id="wd-lastname" /><br/>
-      <input defaultValue="2000-01-01" type="date" id="wd-dob" /><br/>
-      <input defaultValue="alice@wonderland" type="email" id="wd-email" /><br/>
-      <select defaultValue="FACULTY" id="wd-role">
-        <option value="USER">User</option>       <option value="ADMIN">Admin</option>
-        <option value="FACULTY">Faculty</option> <option value="STUDENT">Student</option>
-      </select><br/>
-      <Link to="/Kambaz/Account/Signin" >Sign out</Link>
-    </div>
-);}
+    <Container fluid className="wd-account-container">
+      <div className="wd-profile-wrapper">
+        <div className="wd-profile-box">
+          <h2 className="wd-signin-title">Profile</h2>
+          <Form>
+            <Form.Group controlId="fullname">
+              <Form.Control type="text" placeholder="Full Name" />
+            </Form.Group>
+
+            <Form.Group controlId="username" className="mt-3">
+              <Form.Control type="text" placeholder="Username" />
+            </Form.Group>
+
+            <Form.Group controlId="email" className="mt-3">
+              <Form.Control type="email" placeholder="Email" />
+            </Form.Group>
+
+            <Form.Group controlId="dob" className="mt-3">
+              <Form.Control type="date" />
+            </Form.Group>
+
+            <Button className="wd-profile-btn mt-3" variant="danger">
+              Signout
+            </Button>
+          </Form>
+        </div>
+      </div>
+    </Container>
+  );
+}
