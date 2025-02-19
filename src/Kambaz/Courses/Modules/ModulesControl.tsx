@@ -1,31 +1,31 @@
-import { Button, Dropdown } from "react-bootstrap";
 import { FaPlus } from "react-icons/fa6";
 import GreenCheckmark from "./GreenCheckmark";
-import "../../styles.css";
-
-export default function ModulesControlButtons() {
-  return (
-    <div className="wd-module-controls">
-      <Dropdown>
-        <Dropdown.Toggle variant="secondary">
-          <GreenCheckmark /> Publish All
-        </Dropdown.Toggle>
-        <Dropdown.Menu>
-          <Dropdown.Item>
-            <GreenCheckmark /> Publish All Modules
-          </Dropdown.Item>
-          <Dropdown.Item>
-            <GreenCheckmark /> Publish Items Only
-          </Dropdown.Item>
-          <Dropdown.Item>
-            <GreenCheckmark /> Unpublish All
-          </Dropdown.Item>
-        </Dropdown.Menu>
-      </Dropdown>
-
-      <Button variant="danger">
-        <FaPlus className="me-2" /> Module
-      </Button>
-    </div>
-  );
-}
+import { Button, Dropdown } from "react-bootstrap";
+export default function ModulesControls() {
+ return (
+   <div id="wd-modules-controls" className="text-nowrap">
+     <Button variant="danger" size="lg" className="me-1 float-end" id="wd-add-module-btn">
+       <FaPlus className="position-relative me-2" style={{ bottom: "1px" }} />
+       Module
+     </Button>
+     <Dropdown className="float-end me-2">
+       <Dropdown.Toggle variant="secondary" size="lg" id="wd-publish-all-btn">
+         <GreenCheckmark /> Publish All
+       </Dropdown.Toggle>
+       <Dropdown.Menu>
+         <Dropdown.Item id="wd-publish-all">
+           <GreenCheckmark /> Publish All
+         </Dropdown.Item>
+         <Dropdown.Item id="wd-publish-all-modules-and-items">
+           <GreenCheckmark /> Publish all modules and items
+         </Dropdown.Item>
+         <Dropdown.Item id="wd-publish-modules-only">
+           <GreenCheckmark /> Publish modules only
+         </Dropdown.Item>
+         {/* Create two more items with IDs wd-unpublish-all-modules-and-items and wd-unpublish-modules-only with
+             labels Unpublish all modules and items and Unpublish modules only */}
+       </Dropdown.Menu>
+     </Dropdown>
+     {/* Implement the View Progress and Collapse All buttons with IDs wd-view-progress and wd-collapse-all */}
+   </div>
+);}

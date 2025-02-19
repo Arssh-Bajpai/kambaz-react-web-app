@@ -1,106 +1,63 @@
-import { Form, Button, Container, Row, Col } from "react-bootstrap";
+import { Link } from "react-router-dom";
+import { Button, Container, Row, Col, ListGroup, Form } from "react-bootstrap";
+import { FaPlus, FaSearch, FaCheckCircle } from "react-icons/fa";
 
-export default function AssignmentEditor() {
+export default function Assignments() {
   return (
     <Container fluid className="wd-main-content">
-      <h2 className="mb-4">Assignment Name</h2>
+      <Row className="mb-3 align-items-center">
+        <Col md={6}>
+          <h2 className="mb-0">Assignments</h2>
+        </Col>
+        <Col md={6} className="text-end">
+          <Button variant="danger">
+            <FaPlus className="me-2" /> Group
+          </Button>
+        </Col>
+      </Row>
 
-      <Form>
-        <Form.Group controlId="assignmentName">
-          <Form.Control type="text" placeholder="A1" />
+      {/* Search Bar */}
+      <Form className="mb-3">
+        <Form.Group controlId="searchAssignments" className="d-flex">
+          <Form.Control type="text" placeholder="Search Assignments" />
+          <Button variant="secondary" className="ms-2">
+            <FaSearch />
+          </Button>
         </Form.Group>
-
-        {/* Assignment Instructions */}
-        <Form.Group controlId="assignmentInstructions" className="mt-3">
-          <Form.Text className="text-muted">
-            <p>
-              The assignment is <span className="text-danger">available online</span>.
-            </p>
-            <p>Submit a link to the landing page of your Web application running on <a href="#">Netlify</a>.</p>
-            <p>The landing page should include:</p>
-            <ul>
-              <li>Your full name and section</li>
-              <li>Links to each of the lab assignments</li>
-              <li>Link to the Kanbas application</li>
-              <li>Links to all relevant source code repositories</li>
-            </ul>
-          </Form.Text>
-        </Form.Group>
-
-        {/* Points */}
-        <Row className="mt-4">
-          <Col md={6}>
-            <Form.Group controlId="points">
-              <Form.Label>Points</Form.Label>
-              <Form.Control type="number" placeholder="100" />
-            </Form.Group>
-          </Col>
-
-          <Col md={6}>
-            <Form.Group controlId="assignmentGroup">
-              <Form.Label>Assignment Group</Form.Label>
-              <Form.Select>
-                <option>ASSIGNMENTS</option>
-              </Form.Select>
-            </Form.Group>
-          </Col>
-        </Row>
-
-        {/* Display Grade */}
-        <Form.Group controlId="displayGrade" className="mt-3">
-          <Form.Label>Display Grade as</Form.Label>
-          <Form.Select>
-            <option>Percentage</option>
-          </Form.Select>
-        </Form.Group>
-
-        {/* Submission Type */}
-        <Form.Group controlId="submissionType" className="mt-4">
-          <Form.Label>Submission Type</Form.Label>
-          <Form.Select>
-            <option>Online</option>
-          </Form.Select>
-        </Form.Group>
-
-        {/* Online Entry Options */}
-        <Form.Group controlId="onlineOptions" className="mt-3">
-          <Form.Label>Online Entry Options</Form.Label>
-          <Form.Check type="checkbox" label="Text Entry" />
-          <Form.Check type="checkbox" label="Website URL" defaultChecked />
-          <Form.Check type="checkbox" label="Media Recordings" />
-          <Form.Check type="checkbox" label="Student Annotation" />
-          <Form.Check type="checkbox" label="File Uploads" />
-        </Form.Group>
-
-        {/* Assign To */}
-        <Form.Group controlId="assignTo" className="mt-4">
-          <Form.Label>Assign To</Form.Label>
-          <Form.Control type="text" value="Everyone" readOnly />
-        </Form.Group>
-
-        {/* Due Date */}
-        <Row className="mt-3">
-          <Col md={6}>
-            <Form.Group controlId="dueDate">
-              <Form.Label>Due</Form.Label>
-              <Form.Control type="date" />
-            </Form.Group>
-          </Col>
-
-          <Col md={6}>
-            <Form.Group controlId="availableFrom">
-              <Form.Label>Available From</Form.Label>
-              <Form.Control type="date" />
-            </Form.Group>
-          </Col>
-        </Row>
-
-        {/* Save and Cancel Buttons */}
-        <div className="mt-4 d-flex justify-content-between">
-          <Button variant="secondary">Cancel</Button>
-          <Button variant="danger">Save</Button>
-        </div>
       </Form>
+
+      {/* Assignments List */}
+      <ListGroup>
+        <ListGroup.Item className="d-flex justify-content-between align-items-center">
+          <div>
+            <Link to="/Kambaz/Courses/Assignments/A1" className="text-decoration-none fw-bold">
+              A1: Module 1
+            </Link>
+            <div className="text-muted small">Not available until May 12 at 11:00pm</div>
+          </div>
+          <FaCheckCircle className="text-success" />
+        </ListGroup.Item>
+
+        <ListGroup.Item className="d-flex justify-content-between align-items-center">
+          <div>
+            <Link to="/Kambaz/Courses/Assignments/A2" className="text-decoration-none fw-bold">
+              A2: Module 2
+            </Link>
+            <div className="text-muted small">Not available until May 13 at 12:00am</div>
+          </div>
+          <FaCheckCircle className="text-success" />
+        </ListGroup.Item>
+
+        <ListGroup.Item className="d-flex justify-content-between align-items-center">
+          <div>
+            <Link to="/Kambaz/Courses/Assignments/A3" className="text-decoration-none fw-bold">
+              A3: Module 3
+            </Link>
+            <div className="text-muted small">Due May 17 at 11:59pm</div>
+          </div>
+          <FaCheckCircle className="text-success" />
+        </ListGroup.Item>
+      </ListGroup>
     </Container>
   );
 }

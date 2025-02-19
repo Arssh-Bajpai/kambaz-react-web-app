@@ -51,12 +51,17 @@ export default function KambazNavigation() {
         Inbox
       </Link>
 
-      {/* Labs */}
-      <Link to="/Labs"
-            className={`list-group-item text-center border-0 bg-black text-white ${location.pathname.startsWith("/Labs") ? "active-link" : ""}`}>
-        <LiaCogSolid className="fs-1 text-danger" /><br />
-        Labs
-      </Link>
+     {/* Labs - Navigates Directly to Lab 1 */}
+<Link 
+  to="/Labs/Lab1"  // Now goes directly to Lab1
+  className={`list-group-item text-center border-0 bg-black text-white ${
+    location.pathname.startsWith("/Labs") ? "active-link" : ""
+  }`}
+>
+  <LiaCogSolid className="fs-1 text-danger" /><br />
+  Labs
+</Link>
+
 
     </div>
   );
