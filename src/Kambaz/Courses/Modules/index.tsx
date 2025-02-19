@@ -1,44 +1,31 @@
-import { ListGroup } from "react-bootstrap";
-import ModulesControls from "./ModulesControl";
-import "../../styles.css";
+import { FaCheckCircle } from "react-icons/fa";
+import "../../styles.css"; // Ensure your styles are included
 
 export default function Modules() {
   return (
-    <div className="wd-modules-container">
-      <ModulesControls />
-      <ListGroup className="rounded-0">
-        {/* Week 1 */}
-        <ListGroup.Item className="wd-module p-0 mb-4">
-          <div className="wd-title p-3 ps-2 bg-secondary d-flex justify-content-between">
-            <span>Week 1</span>
-            <ModulesControls />
-          </div>
-          <ListGroup className="wd-lessons">
-            <ListGroup.Item className="wd-lesson p-3">
-              LEARNING OBJECTIVES
-            </ListGroup.Item>
-            <ListGroup.Item className="wd-lesson p-3">
-              Introduction to Web Development
-            </ListGroup.Item>
-          </ListGroup>
-        </ListGroup.Item>
+    <div id="wd-modules">
+      {/* Week 1 */}
+      <div className="module-header d-flex justify-content-between align-items-center bg-secondary text-white p-2">
+        <span>Week 1</span>
+        <FaCheckCircle className="text-success fs-5" />
+      </div>
+      <div className="module-content border">
+        <div className="p-2 border-bottom">LEARNING OBJECTIVES</div>
+        <div className="p-2 border-bottom">Introduction to the course</div>
+        <div className="p-2 border-bottom">Learn what is Web Development</div>
+        <div className="p-2 border-bottom">LESSON 1</div>
+        <div className="p-2">LESSON 2</div>
+      </div>
 
-        {/* Week 2 */}
-        <ListGroup.Item className="wd-module p-0 mb-4">
-          <div className="wd-title p-3 ps-2 bg-secondary d-flex justify-content-between">
-            <span>Week 2</span>
-            <ModulesControls />
-          </div>
-          <ListGroup className="wd-lessons">
-            <ListGroup.Item className="wd-lesson p-3">
-              LESSON 1
-            </ListGroup.Item>
-            <ListGroup.Item className="wd-lesson p-3">
-              LESSON 2
-            </ListGroup.Item>
-          </ListGroup>
-        </ListGroup.Item>
-      </ListGroup>
+      {/* Week 2 */}
+      <div className="module-header d-flex justify-content-between align-items-center bg-secondary text-white p-2 mt-3">
+        <span>Week 2</span>
+        <FaCheckCircle className="text-success fs-5" />
+      </div>
+      <div className="module-content border">
+        <div className="p-2 border-bottom">LESSON 1</div>
+        <div className="p-2">LESSON 2</div>
+      </div>
     </div>
   );
 }

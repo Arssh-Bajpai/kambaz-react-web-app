@@ -32,6 +32,14 @@ export default function PeopleTable() {
             <td>2024-02-05</td>
             <td>15:42:18</td>
           </tr>
+          <tr>
+            <td><FaUserCircle className="me-2 fs-1 text-secondary" /> Peter Parker</td>
+            <td>001234562S</td>
+            <td>S103</td>
+            <td>STUDENT</td>
+            <td>2024-02-07</td>
+            <td>18:27:39</td>
+          </tr>
         </tbody>
       </Table>
     </div>

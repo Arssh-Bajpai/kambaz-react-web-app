@@ -1,34 +1,44 @@
-import { Form, Button, Container } from "react-bootstrap";
+import { Form, Button, Container, Row, Col } from "react-bootstrap";
+import { Link } from "react-router-dom";
 
 export default function Profile() {
   return (
-    <Container fluid className="wd-account-container">
-      <div className="wd-profile-wrapper">
-        <div className="wd-profile-box">
-          <h2 className="wd-signin-title">Profile</h2>
-          <Form>
-            <Form.Group controlId="fullname">
-              <Form.Control type="text" placeholder="Full Name" />
-            </Form.Group>
+    <Container fluid className="vh-100">
+      <Row>
+        {/* Sidebar Navigation */}
+        <Col xs={2} className="bg-white text-black p-3 vh-100 d-flex flex-column align-items-start">
+          <h3 className="fw-bold mb-3">Account</h3>
+          <Link to="/Kambaz/Account/Signup" className="text-danger mb-2">Signup</Link>
+          <Link to="/Kambaz/Account/Profile" className="text-danger">Profile</Link>
+        </Col>
 
-            <Form.Group controlId="username" className="mt-3">
-              <Form.Control type="text" placeholder="Username" />
-            </Form.Group>
+        {/* Profile Form Section */}
+        <Col xs={10} className="p-5">
+          <h2 className="mb-4">Profile</h2>
 
-            <Form.Group controlId="email" className="mt-3">
-              <Form.Control type="email" placeholder="Email" />
-            </Form.Group>
+          <div className="border p-4 rounded shadow-sm" style={{ maxWidth: "400px" }}>
+            <Form>
+              <Form.Group className="mb-3">
+                <Form.Control placeholder="Full Name" />
+              </Form.Group>
 
-            <Form.Group controlId="dob" className="mt-3">
-              <Form.Control type="date" />
-            </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Control placeholder="Username" />
+              </Form.Group>
 
-            <Button className="wd-profile-btn mt-3" variant="danger">
-              Signout
-            </Button>
-          </Form>
-        </div>
-      </div>
+              <Form.Group className="mb-3">
+                <Form.Control placeholder="Email" />
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Control type="date" />
+              </Form.Group>
+
+              <Button className="btn btn-danger w-100 mb-2">Signout</Button>
+            </Form>
+          </div>
+        </Col>
+      </Row>
     </Container>
   );
 }

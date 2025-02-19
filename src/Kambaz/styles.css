@@ -249,3 +249,45 @@
 .wd-signin-link:hover {
   text-decoration: underline;
 }
+.list-group.wd > .list-group-item.active {
+  color: black;
+  background-color: white;
+  border-left: 3px solid black !important;
+}
+/* Navigation bar container */
+#wd-courses-navigation {
+  position: fixed;  /* Keeps it in place while scrolling */
+  top: 100px;       /* Adjust the vertical position */
+  left: 20px;       /* Adjust the horizontal position */
+  width: 220px;     /* Adjust width */
+  background-color: #f8f9fa; /* Light background */
+  border-radius: 8px; /* Rounded corners */
+  padding: 10px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+/* Navigation links */
+#wd-courses-navigation .list-group-item {
+  background-color: transparent; /* No background */
+  color: #333; /* Default text color */
+  border: none; /* Remove border */
+  padding: 12px 15px; /* Add padding */
+  transition: background-color 0.3s ease-in-out;
+}
+
+/* Active link */
+#wd-courses-navigation .list-group-item.active {
+  background-color: #007bff; /* Bootstrap primary blue */
+  color: white;
+}
+
+/* Hover effect */
+#wd-courses-navigation .list-group-item:hover {
+  background-color: #e9ecef; /* Light gray background */
+  color: #0056b3; /* Darker blue text */
+}
+
+/* Add spacing between links */
+#wd-courses-navigation .list-group-item + .list-group-item {
+  margin-top: 5px;
+}

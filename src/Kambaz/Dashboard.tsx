@@ -13,7 +13,7 @@ const courses = [
 
 export default function Dashboard() {
   return (
-    <Container fluid style={{ marginLeft: "160px", padding: "20px" }}>
+    <Container fluid style={{ marginLeft: "0px", padding: "20px" }}>
       <h1 id="wd-dashboard-title" className="mt-3">Dashboard</h1>
       <hr />
       <h2 id="wd-dashboard-published" className="mt-3">Published Courses ({courses.length})</h2>
