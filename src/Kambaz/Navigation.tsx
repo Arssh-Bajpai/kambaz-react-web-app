@@ -1,68 +1,64 @@
-import { Link, useLocation } from "react-router-dom";
-import { AiOutlineDashboard } from "react-icons/ai";
-import { IoCalendarOutline } from "react-icons/io5";
-import { LiaBookSolid, LiaCogSolid } from "react-icons/lia";
-import { FaInbox, FaRegCircleUser } from "react-icons/fa6";
+import { useState, useEffect } from "react";
+import { NavLink, useParams } from "react-router-dom";
 
-export default function KambazNavigation() {
-  const location = useLocation(); // Get current route for active link styling
+export default function CourseNavigation() {
+  const { cid } = useParams(); // Get course ID from URL
+
+  // Define navigation links dynamically
+  const links = ["Home", "Modules", "Piazza", "Zoom", "Assignments", "Quizzes", "Grades", "People"];
+
+  const [leftPosition, setLeftPosition] = useState(220); // Adjusted position further right
+  const [topPosition, setTopPosition] = useState(120); // Lowered sidebar
+
+  useEffect(() => {
+    const updateNavPosition = () => {
+      setLeftPosition(window.innerWidth < 768 ? 60 : 220); // Adjust left dynamically
+      setTopPosition(window.innerWidth < 768 ? 100 : 120); // Adjust top dynamically
+    };
+
+    window.addEventListener("resize", updateNavPosition);
+    updateNavPosition(); // Initial positioning
+
+    return () => window.removeEventListener("resize", updateNavPosition);
+  }, []);
 
   return (
-    <div id="wd-kambaz-navigation" className="list-group rounded-0 position-fixed bottom-0 top-0 d-none d-md-block bg-black z-2">
-      
-      {/* Northeastern University Logo */}
-      <a id="wd-neu-link" target="_blank" href="https://www.northeastern.edu/"
-         className="list-group-item bg-black border-0 text-center text-white">
-        <img src="/images/NEU.png" width="75px" alt="Northeastern University Logo" />
-      </a>
+    <div 
+      id="wd-courses-navigation"
+      className="wd list-group fs-5 rounded-0"
+      style={{ 
+        position: "fixed", 
+        left: `${leftPosition}px`, // Adjusted right
+        top: `${topPosition}px`, // Lowered dynamically
+        width: "230px",
+        backgroundColor: "white",
+        padding: "12px",
+        borderRadius: "8px",
+        boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.15)",
+        zIndex: 1000,
+      }} 
+    >
+      {links.map((link) => {
+        let linkPath;
 
-      {/* Account */}
-      <Link to="/Kambaz/Account"
-            className={`list-group-item text-center border-0 bg-black text-white ${location.pathname === "/Kambaz/Account" ? "active-link" : ""}`}>
-        <FaRegCircleUser className="fs-1" /><br />
-        Account
-      </Link>
+        // Special case: Assignments should link to the Assignments page, not an editor
+        if (link === "Assignments") {
+          linkPath = `/Kambaz/Courses/${cid}/Assignments`;
+        } else {
+          linkPath = `/Kambaz/Courses/${cid}/${link}`;
+        }
 
-      {/* Dashboard */}
-      <Link to="/Kambaz/Dashboard"
-            className={`list-group-item text-center border-0 ${location.pathname.startsWith("/Kambaz/Dashboard") ? "active-link" : "inactive-link"}`}>
-        <AiOutlineDashboard className="fs-1" /><br />
-        Dashboard
-      </Link>
-
-      {/* Courses (Fixed Route) */}
-      <Link to="/Kambaz/Dashboard"
-            className={`list-group-item text-center border-0 bg-black text-white ${location.pathname.startsWith("/Kambaz/Courses") ? "active-link" : ""}`}>
-        <LiaBookSolid className="fs-1 text-danger" /><br />
-        Courses
-      </Link>
-
-      {/* Calendar */}
-      <Link to="/Kambaz/Calendar"
-            className={`list-group-item text-center border-0 bg-black text-white ${location.pathname.startsWith("/Kambaz/Calendar") ? "active-link" : ""}`}>
-        <IoCalendarOutline className="fs-1 text-danger" /><br />
-        Calendar
-      </Link>
-
-      {/* Inbox */}
-      <Link to="/Kambaz/Inbox"
-            className={`list-group-item text-center border-0 bg-black text-white ${location.pathname.startsWith("/Kambaz/Inbox") ? "active-link" : ""}`}>
-        <FaInbox className="fs-1 text-danger" /><br />
-        Inbox
-      </Link>
-
-     {/* Labs - Navigates Directly to Lab 1 */}
-<Link 
-  to="/Labs/Lab1"  // Now goes directly to Lab1
-  className={`list-group-item text-center border-0 bg-black text-white ${
-    location.pathname.startsWith("/Labs") ? "active-link" : ""
-  }`}
->
-  <LiaCogSolid className="fs-1 text-danger" /><br />
-  Labs
-</Link>
-
-
+        return (
+          <NavLink 
+            key={link}
+            to={linkPath} 
+            className={({ isActive }) => `list-group-item list-group-item-action border border-0 ${isActive ? "active-link text-dark" : "text-danger"}`}
+          >
+            {link}
+          </NavLink>
+        );
+      })}
     </div>
   );
 }
+
