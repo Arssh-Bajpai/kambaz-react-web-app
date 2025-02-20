@@ -1,51 +1,49 @@
-import { Routes, Route, useParams, useLocation } from "react-router-dom";
-import coursesData from "../Database/courses.json"; // Import JSON file
+import { Routes, Route, useParams } from "react-router-dom";
 import CourseNavigation from "./Navigation";
 import Home from "./Home";
 import Modules from "./Modules";
 import Assignments from "./Assignments";
 import AssignmentEditor from "./Assignments/Editor";
 import PeopleTable from "./People/Table";
-import { FaAlignJustify } from "react-icons/fa6";
 import "../styles.css"; // Ensure styles exist
-
-interface CourseData {
-  _id: string;
-  name: string;
-}
+import { courses } from "../Database";
 
 export default function Courses() {
-  const { cid } = useParams<{ cid: string }>(); // Extract course ID from URL
-  const { pathname } = useLocation(); // Get current path
+  // Extract `cid` from URL
+  const { cid } = useParams();
+  console.log("🚀 useParams() returned:", cid || "❌ No cid found");
 
-  // Debugging: Log URL and Courses.json Data
-  console.log("🔍 URL Course ID (cid):", cid);
-  console.log("📚 Available Courses:", coursesData.map(course => course._id));
-
-  // Find matching course
-  const selectedCourse = coursesData.find((course: CourseData) => {
-    console.log(`Checking course ID: ${course._id} against URL ID: ${cid}`);
-    return course._id === cid;
-  });
-
-  if (!selectedCourse) {
-    console.warn(`⚠️ Course not found for ID: ${cid}`);
-    return <div className="wd-main-content">Course not found</div>;
+  if (!cid) {
+    console.error("❌ cid is undefined. Ensure the route includes ':cid'.");
   }
 
+  // Ensure `courses` is loaded properly
+  console.log("📚 courses array:", courses);
+
+  // Find the course by ID
+  const course = cid 
+    ? courses?.find((course) => {
+        console.log("🔍 Checking course:", course._id.toString(), "against cid:", cid);
+        return course._id.toString() === cid;
+      })
+    : undefined;
+
+  console.log("✅ Matching course found:", course || "❌ No matching course found");
+
+  // Set the course name
+  const courseName = course?.name || "Course Not Found";
+  console.log("📌 Final Course Name:", courseName);
+
   return (
-    <div id="wd-courses" className="d-flex vh-100">
+    <div id="wd-courses" className="d-flex">
       {/* Sidebar Navigation */}
-      <CourseNavigation />
+      <div className="wd-sidebar">
+        <h1 className="wd-course-title">{courseName}</h1>
+        {<CourseNavigation />}
+      </div>
 
       {/* Main Content */}
-      <div className="flex-grow-1 ms-5 ps-5">
-        <h2 className="text-danger">
-          <FaAlignJustify className="me-4 fs-4 mb-1" />
-          {selectedCourse.name} {pathname.split("/")[4] ? `> ${pathname.split("/")[4]}` : ""}
-        </h2>
-
-        {/* Course Routes */}
+      <div className="wd-main-content">
         <Routes>
           <Route path="Home" element={<Home />} />
           <Route path="Modules" element={<Modules />} />

@@ -1,128 +1,65 @@
-import { NavLink, useParams } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
-import coursesData from "../Database/courses.json"; // Import courses from JSON
-
-// Define the structure of a course object based on `courses.json`
-interface CourseData {
-  _id: string;
-  name: string;
-  number: string;
-  startDate: string;
-  endDate: string;
-  department: string;
-  credits: number;
-  description: string;
-}
+import { useParams } from "react-router-dom";
 
 export default function CourseNavigation() {
-  const { cid } = useParams<{ cid: string }>(); // Get course ID from URL
-  const [courseName, setCourseName] = useState<string>("Loading...");
+  const { cid } = useParams(); // Get course ID from URL
+  const location = useLocation(); // Get current pathname for highlighting active links
 
-  useEffect(() => {
-    // Ensure that coursesData is an array and find the course by ID
-    if (Array.isArray(coursesData)) {
-      const selectedCourse = coursesData.find((course: CourseData) => course._id === cid);
-      setCourseName(selectedCourse ? selectedCourse.name : "Course Not Found");
-    } else {
-      setCourseName("Error Loading Courses");
-    }
-  }, [cid]); // Re-run effect when `cid` changes
+  // Define navigation links dynamically
+  const links = ["Home", "Modules", "Piazza", "Zoom", "Assignments", "Quizzes", "Grades", "People"];
 
-  const [leftPosition, setLeftPosition] = useState<number>(150);
+  const [leftPosition, setLeftPosition] = useState(220); // Adjusted position further right
+  const [topPosition, setTopPosition] = useState(120); // Lowered sidebar
 
   useEffect(() => {
     const updateNavPosition = () => {
-      setLeftPosition(window.innerWidth < 768 ? 20 : 150);
+      setLeftPosition(window.innerWidth < 768 ? 60 : 220); // Adjust left dynamically
+      setTopPosition(window.innerWidth < 768 ? 100 : 120); // Adjust top dynamically
     };
 
     window.addEventListener("resize", updateNavPosition);
-    updateNavPosition(); // Initial call
+    updateNavPosition(); // Initial positioning
 
     return () => window.removeEventListener("resize", updateNavPosition);
   }, []);
 
   return (
-    <div
+    <div 
       id="wd-courses-navigation"
       className="wd list-group fs-5 rounded-0"
-      style={{
-        position: "fixed",
-        left: `${leftPosition}px`,
-        top: "0px",
-        width: "220px",
-        height: "100vh",
-        backgroundColor: "#f8f9fa",
-        overflowY: "auto",
-      }}
+      style={{ 
+        position: "fixed", 
+        left: `${leftPosition}px`, // Adjusted right
+        top: `${topPosition}px`, // Lowered dynamically
+        width: "230px",
+        backgroundColor: "white",
+        padding: "12px",
+        borderRadius: "8px",
+        boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.15)",
+        zIndex: 1000,
+      }} 
     >
-      {/* Course Name at the Top */}
-      <div className="p-3 fw-bold text-center bg-dark text-white">
-        {courseName}
-      </div>
+      {links.map((link) => {
+        let linkPath;
 
-      {/* Navigation Links */}
-      <NavLink
-        to={`/Kambaz/Courses/${cid}/Home`}
-        className={({ isActive }) =>
-          `list-group-item list-group-item-action border border-0 ${isActive ? "active-link" : ""}`
+        // Special case: Assignments should link to the Assignments page, not an editor
+        if (link === "Assignments") {
+          linkPath = `/Kambaz/Courses/${cid}/Assignments`;
+        } else {
+          linkPath = `/Kambaz/Courses/${cid}/${link}`;
         }
-      >
-        Home
-      </NavLink>
 
-      <NavLink
-        to={`/Kambaz/Courses/${cid}/Modules`}
-        className={({ isActive }) =>
-          `list-group-item list-group-item-action border border-0 ${isActive ? "active-link text-primary" : "text-danger"}`
-        }
-      >
-        Modules
-      </NavLink>
-
-      <NavLink
-        to={`/Kambaz/Courses/${cid}/Piazza`}
-        className={({ isActive }) =>
-          `list-group-item list-group-item-action border border-0 ${isActive ? "active-link text-primary" : "text-danger"}`
-        }
-      >
-        Piazza
-      </NavLink>
-
-      <NavLink
-        to={`/Kambaz/Courses/${cid}/Zoom`}
-        className={({ isActive }) =>
-          `list-group-item list-group-item-action border border-0 ${isActive ? "active-link text-primary" : "text-danger"}`
-        }
-      >
-        Zoom
-      </NavLink>
-
-      <NavLink
-        to={`/Kambaz/Courses/${cid}/Assignments`}
-        className={({ isActive }) =>
-          `list-group-item list-group-item-action border border-0 ${isActive ? "active-link text-primary" : "text-danger"}`
-        }
-      >
-        Assignments
-      </NavLink>
-
-      <NavLink
-        to={`/Kambaz/Courses/${cid}/Quizzes`}
-        className={({ isActive }) =>
-          `list-group-item list-group-item-action border border-0 ${isActive ? "active-link text-primary" : "text-danger"}`
-        }
-      >
-        Quizzes
-      </NavLink>
-
-      <NavLink
-        to={`/Kambaz/Courses/${cid}/People`}
-        className={({ isActive }) =>
-          `list-group-item list-group-item-action border border-0 ${isActive ? "active-link text-primary" : "text-danger"}`
-        }
-      >
-        People
-      </NavLink>
+        return (
+          <NavLink 
+            key={link}
+            to={linkPath} 
+            className={({ isActive }) => `list-group-item list-group-item-action border border-0 ${isActive ? "active-link text-dark" : "text-danger"}`}
+          >
+            {link}
+          </NavLink>
+        );
+      })}
     </div>
   );
 }

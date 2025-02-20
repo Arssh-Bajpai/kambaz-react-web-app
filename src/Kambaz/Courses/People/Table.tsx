@@ -1,7 +1,14 @@
 import { Table } from "react-bootstrap";
 import { FaUserCircle } from "react-icons/fa";
+import { useParams } from "react-router-dom";
+import enrollments from "../../Database/enrollments.json"; // Import enrollments
 
 export default function PeopleTable() {
+  const { cid } = useParams(); // Get course ID from URL
+
+  // Filter enrollments to get only users in the current course
+  const enrolledUsers = enrollments.filter((enrollment) => enrollment.course === cid);
+
   return (
     <div id="wd-people-table">
       <Table striped>
@@ -16,30 +23,19 @@ export default function PeopleTable() {
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td><FaUserCircle className="me-2 fs-1 text-secondary" /> Tony Stark</td>
-            <td>001234561S</td>
-            <td>S101</td>
-            <td>STUDENT</td>
-            <td>2024-02-06</td>
-            <td>10:21:32</td>
-          </tr>
-          <tr>
-            <td><FaUserCircle className="me-2 fs-1 text-secondary" /> Bruce Wayne</td>
-            <td>001234562S</td>
-            <td>S102</td>
-            <td>STUDENT</td>
-            <td>2024-02-05</td>
-            <td>15:42:18</td>
-          </tr>
-          <tr>
-            <td><FaUserCircle className="me-2 fs-1 text-secondary" /> Peter Parker</td>
-            <td>001234562S</td>
-            <td>S103</td>
-            <td>STUDENT</td>
-            <td>2024-02-07</td>
-            <td>18:27:39</td>
-          </tr>
+          {enrolledUsers.map((user) => (
+            <tr key={user._id}>
+              <td>
+                <FaUserCircle className="me-2 fs-1 text-secondary" />
+                User {user.user} {/* Replace with actual user data if available */}
+              </td>
+              <td>{user.user}</td>
+              <td>{user.course}</td>
+              <td>STUDENT</td> {/* Default role since no role data exists */}
+              <td>N/A</td> {/* Placeholder for last activity */}
+              <td>N/A</td> {/* Placeholder for total activity */}
+            </tr>
+          ))}
         </tbody>
       </Table>
     </div>
