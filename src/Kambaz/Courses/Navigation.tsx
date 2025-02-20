@@ -1,10 +1,8 @@
-import { NavLink, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 
 export default function CourseNavigation() {
   const { cid } = useParams(); // Get course ID from URL
-  const location = useLocation(); // Get current pathname for highlighting active links
 
   // Define navigation links dynamically
   const links = ["Home", "Modules", "Piazza", "Zoom", "Assignments", "Quizzes", "Grades", "People"];
