@@ -1,13 +1,28 @@
+import { useParams, Link } from "react-router-dom";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
+import assignments from "../../Database/assignments.json"; // Import assignments directly
 
 export default function AssignmentEditor() {
+  const { cid, aid } = useParams(); // Get course ID and assignment ID from URL
+  const assignment = assignments.find((a) => a._id === aid && a.course === cid); // Find the correct assignment
+
+  if (!assignment) {
+    return (
+      <Container fluid className="wd-main-content">
+        <h2>Assignment Not Found</h2>
+      </Container>
+    );
+  }
+
   return (
     <Container fluid className="wd-main-content">
-      <h2 className="mb-4">Assignment Name</h2>
+      <h2 className="mb-4">{assignment.title}</h2> {/* Display assignment title */}
 
       <Form>
-        <Form.Group controlId="assignmentName">
-          <Form.Control type="text" placeholder="A1" />
+        {/* Assignment Title */}
+        <Form.Group controlId="assignmentTitle">
+          <Form.Label>Assignment Title</Form.Label>
+          <Form.Control type="text" defaultValue={assignment.title} />
         </Form.Group>
 
         {/* Assignment Instructions */}
@@ -78,7 +93,7 @@ export default function AssignmentEditor() {
           <Form.Control type="text" value="Everyone" readOnly />
         </Form.Group>
 
-        {/* Due Date */}
+        {/* Due Date & Availability */}
         <Row className="mt-3">
           <Col md={6}>
             <Form.Group controlId="dueDate">
@@ -97,7 +112,9 @@ export default function AssignmentEditor() {
 
         {/* Save and Cancel Buttons */}
         <div className="mt-4 d-flex justify-content-between">
-          <Button variant="secondary">Cancel</Button>
+          <Link to={`/Kambaz/Courses/${cid}/Assignments`}>
+            <Button variant="secondary">Cancel</Button>
+          </Link>
           <Button variant="danger">Save</Button>
         </div>
       </Form>

@@ -31,7 +31,7 @@ export default function KambazNavigation() {
       </Link>
 
       {/* Courses (Fixed Route) */}
-      <Link to="/Kambaz/Courses"
+      <Link to="/Kambaz/Dashboard"
             className={`list-group-item text-center border-0 bg-black text-white ${location.pathname.startsWith("/Kambaz/Courses") ? "active-link" : ""}`}>
         <LiaBookSolid className="fs-1 text-danger" /><br />
         Courses

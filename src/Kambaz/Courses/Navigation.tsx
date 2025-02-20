@@ -1,81 +1,65 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 
 export default function CourseNavigation() {
-  const [leftPosition, setLeftPosition] = useState(150);
+  const { cid } = useParams(); // Get course ID from URL
+  const location = useLocation(); // Get current pathname for highlighting active links
+
+  // Define navigation links dynamically
+  const links = ["Home", "Modules", "Piazza", "Zoom", "Assignments", "Quizzes", "Grades", "People"];
+
+  const [leftPosition, setLeftPosition] = useState(220); // Adjusted position further right
+  const [topPosition, setTopPosition] = useState(120); // Lowered sidebar
 
   useEffect(() => {
     const updateNavPosition = () => {
-      setLeftPosition(window.innerWidth < 768 ? 20 : 150);
+      setLeftPosition(window.innerWidth < 768 ? 60 : 220); // Adjust left dynamically
+      setTopPosition(window.innerWidth < 768 ? 100 : 120); // Adjust top dynamically
     };
 
     window.addEventListener("resize", updateNavPosition);
-    updateNavPosition(); // Initial call
+    updateNavPosition(); // Initial positioning
 
     return () => window.removeEventListener("resize", updateNavPosition);
   }, []);
 
   return (
     <div 
-      id="wd-courses-navigation" 
+      id="wd-courses-navigation"
       className="wd list-group fs-5 rounded-0"
-      style={{ position: "fixed", left: `${leftPosition}px`, top: "0px", width: "200px" }} 
+      style={{ 
+        position: "fixed", 
+        left: `${leftPosition}px`, // Adjusted right
+        top: `${topPosition}px`, // Lowered dynamically
+        width: "230px",
+        backgroundColor: "white",
+        padding: "12px",
+        borderRadius: "8px",
+        boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.15)",
+        zIndex: 1000,
+      }} 
     >
-      {/* Home */}
-      <NavLink 
-        to="/Kambaz/Courses/Home" 
-        className={({ isActive }) => `list-group-item list-group-item-action border border-0 ${isActive ? "active-link" : ""}`}
-      >
-        Home
-      </NavLink>
+      {links.map((link) => {
+        let linkPath;
 
-      {/* Modules */}
-      <NavLink 
-        to="/Kambaz/Courses/Home" 
-        className={({ isActive }) => `list-group-item list-group-item-action border border-0 ${isActive ? "active-link text-primary" : "text-danger"}`}
-      >
-        Modules
-      </NavLink>
+        // Special case: Assignments should link to the Assignments page, not an editor
+        if (link === "Assignments") {
+          linkPath = `/Kambaz/Courses/${cid}/Assignments`;
+        } else {
+          linkPath = `/Kambaz/Courses/${cid}/${link}`;
+        }
 
-      {/* Piazza */}
-      <NavLink 
-        to="/Kambaz/Courses/Piazza" 
-        className={({ isActive }) => `list-group-item list-group-item-action border border-0 ${isActive ? "active-link text-primary" : "text-danger"}`}
-      >
-        Piazza
-      </NavLink>
-
-      {/* Zoom */}
-      <NavLink 
-        to="/Kambaz/Courses/Zoom" 
-        className={({ isActive }) => `list-group-item list-group-item-action border border-0 ${isActive ? "active-link text-primary" : "text-danger"}`}
-      >
-        Zoom
-      </NavLink>
-
-      {/* Assignments */}
-      <NavLink 
-        to="/Kambaz/Courses/Assignments" 
-        className={({ isActive }) => `list-group-item list-group-item-action border border-0 ${isActive ? "active-link text-primary" : "text-danger"}`}
-      >
-        Assignments
-      </NavLink>
-
-      {/* Quizzes */}
-      <NavLink 
-        to="/Kambaz/Courses/Quizzes" 
-        className={({ isActive }) => `list-group-item list-group-item-action border border-0 ${isActive ? "active-link text-primary" : "text-danger"}`}
-      >
-        Quizzes
-      </NavLink>
-
-      {/* People */}
-      <NavLink 
-        to="/Kambaz/Courses/People" 
-        className={({ isActive }) => `list-group-item list-group-item-action border border-0 ${isActive ? "active-link text-primary" : "text-danger"}`}
-      >
-        People
-      </NavLink>
+        return (
+          <NavLink 
+            key={link}
+            to={linkPath} 
+            className={({ isActive }) => `list-group-item list-group-item-action border border-0 ${isActive ? "active-link text-dark" : "text-danger"}`}
+          >
+            {link}
+          </NavLink>
+        );
+      })}
     </div>
   );
 }
