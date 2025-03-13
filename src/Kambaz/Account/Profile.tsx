@@ -1,44 +1,47 @@
-import { Form, Button, Container, Row, Col } from "react-bootstrap";
-import { Link } from "react-router-dom";
-
+import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { setCurrentUser } from "./reducer";
+import { Button, FormControl } from "react-bootstrap";
 export default function Profile() {
+  const [profile, setProfile] = useState<any>({});
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
+  const fetchProfile = () => {
+    if (!currentUser) return navigate("/Kambaz/Account/Signin");
+    setProfile(currentUser);
+  };
+  const signout = () => {
+    dispatch(setCurrentUser(null));
+    navigate("/Kambaz/Account/Signin");
+  };
+  useEffect(() => { fetchProfile(); }, []);
   return (
-    <Container fluid className="vh-100">
-      <Row>
-        {/* Sidebar Navigation */}
-        <Col xs={2} className="bg-white text-black p-3 vh-100 d-flex flex-column align-items-start">
-          <h3 className="fw-bold mb-3">Account</h3>
-          <Link to="/Kambaz/Account/Signup" className="text-danger mb-2">Signup</Link>
-          <Link to="/Kambaz/Account/Profile" className="text-danger">Profile</Link>
-        </Col>
-
-        {/* Profile Form Section */}
-        <Col xs={10} className="p-5">
-          <h2 className="mb-4">Profile</h2>
-
-          <div className="border p-4 rounded shadow-sm" style={{ maxWidth: "400px" }}>
-            <Form>
-              <Form.Group className="mb-3">
-                <Form.Control placeholder="Full Name" />
-              </Form.Group>
-
-              <Form.Group className="mb-3">
-                <Form.Control placeholder="Username" />
-              </Form.Group>
-
-              <Form.Group className="mb-3">
-                <Form.Control placeholder="Email" />
-              </Form.Group>
-
-              <Form.Group className="mb-3">
-                <Form.Control type="date" />
-              </Form.Group>
-
-              <Button className="btn btn-danger w-100 mb-2">Signout</Button>
-            </Form>
-          </div>
-        </Col>
-      </Row>
-    </Container>
-  );
-}
+    <div className="wd-profile-screen">
+      <h3>Profile</h3>
+      {profile && (
+        <div>
+          <FormControl defaultValue={profile.username} id="wd-username" className="mb-2"
+                       onChange={(e) => setProfile({ ...profile, username:  e.target.value })}/>
+          <FormControl defaultValue={profile.password} id="wd-password" className="mb-2"
+                       onChange={(e) => setProfile({ ...profile, password:  e.target.value })}/>
+          <FormControl defaultValue={profile.firstName} id="wd-firstname" className="mb-2"
+                       onChange={(e) => setProfile({ ...profile, firstName: e.target.value })}/>
+          <FormControl defaultValue={profile.lastName} id="wd-lastname" className="mb-2"
+                       onChange={(e) => setProfile({ ...profile, lastName:  e.target.value })}/>
+          <FormControl defaultValue={profile.dob} id="wd-dob" className="mb-2"
+                       onChange={(e) => setProfile({ ...profile, dob: e.target.value })} type="date"/>
+          <FormControl defaultValue={profile.email} id="wd-email" className="mb-2"
+                       onChange={ (e) => setProfile({ ...profile, email: e.target.value })}/>
+          <select onChange={(e) => setProfile({ ...profile, role:  e.target.value })}
+                 className="form-control mb-2" id="wd-role">
+            <option value="USER">User</option>            <option value="ADMIN">Admin</option>
+            <option value="FACULTY">Faculty</option>      <option value="STUDENT">Student</option>
+          </select>
+          <Button onClick={signout} className="w-100 mb-2" id="wd-signout-btn">
+            Sign out
+          </Button>
+        </div>
+      )}
+</div>);}

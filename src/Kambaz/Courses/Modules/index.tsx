@@ -1,56 +1,73 @@
-import { useParams } from "react-router-dom";
-import * as db from "../../Database";
-import { BsGripVertical } from "react-icons/bs"; // Drag icon
-import ModulesControl from "./ModulesControl"; // Import module control buttons
-import LessonControlButtons from "./LessonControlButtons"; // Import lesson controls
-import GreenCheckmark from "./GreenCheckmark"; // Import checkmark icon
-
-// Define TypeScript interfaces to match `modules.json`
-interface Lesson {
-  _id: string;
-  name: string;
-}
-
-interface Module {
-  _id: string;
-  name: string;
-  description: string;
-  course: string;
-  lessons?: Lesson[]; // Updated to correctly type lessons
-}
+import { useParams } from "react-router";
+import { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import ModuleControlButtons from "./ModuleControlButtons";
+import ModulesControls from "./ModulesControl";
+import { ListGroup, FormControl } from "react-bootstrap";
+import { addModule, editModule, updateModule, deleteModule } from "./reducer";
 
 export default function Modules() {
-  const { cid } = useParams(); // Get course ID from URL
-  const modules: Module[] = db.modules; // Get all modules from database
+  const { cid } = useParams();
+  const [moduleName, setModuleName] = useState("");
+  const { modules } = useSelector((state: any) => state.modulesReducer);
+  const dispatch = useDispatch();
 
   return (
-    <ul id="wd-modules" className="list-group rounded-0">
-      {modules
-        .filter((module) => module.course === cid) // Only show modules for the selected course
-        .map((module) => (
-          <li key={module._id} className="wd-module list-group-item p-0 mb-5 fs-5 border-gray">
-            <div className="wd-title p-3 ps-2 bg-secondary d-flex align-items-center justify-content-between">
-              <span className="d-flex align-items-center">
-                <BsGripVertical className="me-2 fs-3" /> {/* Drag icon */}
-                {module.name}
-              </span>
-              <ModulesControl /> {/* Module control buttons */}
-            </div>
+    <div className="wd-modules">
+      {/* ✅ Improved Module Header */}
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h4 className="text-dark fw-bold">Modules</h4>
+        <div>
+          <button className="btn btn-secondary me-2">✅ Publish All</button>
+          <button className="btn btn-danger">➕ Module</button>
+        </div>
+      </div>
 
-            {/* Render lessons for each module, correctly accessing lesson names */}
-            <ul className="wd-lessons list-group rounded-0">
-              {module.lessons?.map((lesson) => (
-                <li key={lesson._id} className="wd-lesson list-group-item p-3 ps-1 d-flex justify-content-between">
-                  {lesson.name} {/* Now correctly accessing lesson name */}
-                  <span className="d-flex align-items-center">
-                    <GreenCheckmark /> {/* Add checkmark if lesson is completed */}
-                    <LessonControlButtons /> {/* Lesson control buttons */}
-                  </span>
-                </li>
-              )) || <li className="list-group-item p-3 ps-1 text-muted">No lessons available</li>}
-            </ul>
-          </li>
-        ))}
-    </ul>
+      {/* ✅ Improved Module Controls */}
+      <ModulesControls 
+        moduleName={moduleName} 
+        setModuleName={setModuleName} 
+        addModule={() => {
+          dispatch(addModule({ name: moduleName, course: cid }));
+          setModuleName("");
+        }} 
+      />
+      
+      <ListGroup id="wd-modules" className="rounded-0">
+        {modules
+          .filter((module: any) => module.course === cid)
+          .map((module: any) => (
+            <ListGroup.Item 
+              key={module._id} 
+              className="wd-module p-2 mb-3 border bg-light rounded shadow-sm d-flex justify-content-between align-items-center"
+            >
+              <div>
+                {!module.editing && <span className="fs-5">{module.name}</span>}
+                {module.editing && (
+                  <FormControl
+                    className="w-50 d-inline-block"
+                    onChange={(e) =>
+                      dispatch(updateModule({ ...module, name: e.target.value }))
+                    }
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        dispatch(updateModule({ ...module, editing: false }));
+                      }
+                    }}
+                    defaultValue={module.name}
+                  />
+                )}
+              </div>
+
+              {/* ✅ Improved Button Alignment */}
+              <ModuleControlButtons 
+                moduleId={module._id}
+                deleteModule={(moduleId) => dispatch(deleteModule(moduleId))}
+                editModule={(moduleId) => dispatch(editModule(moduleId))}
+              />
+            </ListGroup.Item>
+          ))}
+      </ListGroup>
+    </div>
   );
 }

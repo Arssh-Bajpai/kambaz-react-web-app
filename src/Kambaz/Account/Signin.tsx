@@ -1,39 +1,31 @@
-import { Form, Button, Container, Row, Col } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { setCurrentUser } from "./reducer";
+import { useDispatch } from "react-redux";
+import * as db from "../Database";
+import { Button, FormControl } from "react-bootstrap";
 
 export default function Signin() {
+  const [credentials, setCredentials] = useState<any>({});
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const signin = () => {
+    const user = db.users.find(
+      (u: any) => u.username === credentials.username && u.password === credentials.password);
+    if (!user) return;
+    dispatch(setCurrentUser(user));
+    navigate("/Kambaz/Dashboard");
+  };
   return (
-    <Container fluid className="vh-100">
-      <Row>
-        {/* Sidebar Navigation - Now properly positioned */}
-        <Col xs={2} className="bg-white text-black p-3 vh-100 d-flex flex-column align-items-start">
-          <h3 className="fw-bold mb-3">Account</h3>
-          <Link to="/Kambaz/Account/Signup" className="text-danger mb-2">Signup</Link>
-          <Link to="/Kambaz/Account/Profile" className="text-danger">Profile</Link>
-        </Col>
-
-        {/* Signin Form Section */}
-        <Col xs={10} className="d-flex align-items-center justify-content-start p-5">
-          <div className="border p-4 rounded shadow-sm" style={{ maxWidth: "400px" }}>
-            <h2 className="mb-3">Sign In</h2>
-            <Form>
-              <Form.Group className="mb-3">
-                <Form.Control placeholder="Username" />
-              </Form.Group>
-
-              <Form.Group className="mb-3">
-                <Form.Control type="password" placeholder="Password" />
-              </Form.Group>
-
-              <Button className="btn btn-primary w-100 mb-2">Sign in</Button>
-            </Form>
-
-            <div className="text-center">
-              Don't have an account? <Link to="/Kambaz/Account/Signup" className="text-primary">Sign up</Link>
-            </div>
-          </div>
-        </Col>
-      </Row>
-    </Container>
-  );
-}
+    <div id="wd-signin-screen">
+      <h1>Sign in</h1>
+      <FormControl defaultValue={credentials.username}
+             onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}
+             className="mb-2" placeholder="username" id="wd-username" />
+      <FormControl defaultValue={credentials.password}
+             onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
+             className="mb-2" placeholder="password" type="password" id="wd-password" />
+      <Button onClick={signin} id="wd-signin-btn" className="w-100" > Sign in </Button>
+      <Link id="wd-signup-link" to="/Kambaz/Account/Signup"> Sign up </Link>
+    </div>
+);}

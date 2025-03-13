@@ -3,10 +3,11 @@ import { AiOutlineDashboard } from "react-icons/ai";
 import { IoCalendarOutline } from "react-icons/io5";
 import { LiaBookSolid, LiaCogSolid } from "react-icons/lia";
 import { FaInbox, FaRegCircleUser } from "react-icons/fa6";
+import { useSelector } from "react-redux";
 
 export default function KambazNavigation() {
   const location = useLocation(); // Get current route for active link styling
-
+  useSelector((state: any) => state.accountReducer);
   return (
     <div id="wd-kambaz-navigation" className="list-group rounded-0 position-fixed bottom-0 top-0 d-none d-md-block bg-black z-2">
       

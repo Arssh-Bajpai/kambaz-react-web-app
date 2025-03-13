@@ -4,10 +4,13 @@ import Dashboard from "./Kambaz/Dashboard";
 import Account from "./Kambaz/Account";
 import Courses from "./Kambaz/Courses";
 import Labs from "./Labs"; // Labs Homepage
+import store from "./Kambaz/store";
+import { Provider } from "react-redux";
 
 export default function App() {
   return (
     <Router>
+        <Provider store={store}>
       <div className="d-flex">
         {/* Sidebar Navigation */}
         <KambazNavigation />
@@ -24,10 +27,11 @@ export default function App() {
             <Route path="/Labs/*" element={<Labs />} />
 
             {/* Updated Courses Route with `:cid` */}
-            <Route path="/Kambaz/Courses/:cid/*" element={<Courses />} />
+            <Route path="/Kambaz/Courses/:cid/*" element={<Courses courses={[]} />} />
           </Routes>
         </div>
       </div>
+      </Provider>
     </Router>
   );
 }
