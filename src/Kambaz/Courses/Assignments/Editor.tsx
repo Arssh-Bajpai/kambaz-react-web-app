@@ -1,121 +1,132 @@
-import { useParams, Link } from "react-router-dom";
-import { Form, Button, Container, Row, Col } from "react-bootstrap";
-import assignments from "../../Database/assignments.json"; // Import assignments directly
+// src/Kambaz/Courses/Assignments/AssignmentEditor.tsx
+import { useState, useEffect } from "react";
+import { Container, Form, Button } from "react-bootstrap";
+import { useSelector, useDispatch } from "react-redux";
+import { useParams, useNavigate } from "react-router-dom";
+import { addAssignment, updateAssignment } from "./reducer";
 
 export default function AssignmentEditor() {
-  const { cid, aid } = useParams(); // Get course ID and assignment ID from URL
-  const assignment = assignments.find((a) => a._id === aid && a.course === cid); // Find the correct assignment
+  const { cid, aid } = useParams(); // course ID, assignment ID
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  if (!assignment) {
-    return (
-      <Container fluid className="wd-main-content">
-        <h2>Assignment Not Found</h2>
-      </Container>
-    );
-  }
+  // All assignments from Redux
+  const assignments = useSelector((state: any) => state.assignments.assignments);
+  // If we have an assignment ID, find that assignment
+  const existing = assignments.find(
+    (a: any) => a._id === aid && a.course === cid
+  );
+
+  // Local state for assignment form fields
+  const [assignment, setAssignment] = useState<any>({
+    course: cid,
+    name: "",
+    description: "",
+    points: 100,
+    dueDate: "",
+    availableFrom: "",
+    availableUntil: "",
+  });
+
+  useEffect(() => {
+    if (existing) {
+      setAssignment(existing);
+    }
+  }, [existing]);
+
+  const handleChange = (field: string, value: any) => {
+    setAssignment((prev: any) => ({ ...prev, [field]: value }));
+  };
+
+  const handleSave = () => {
+    if (existing) {
+      // Updating existing
+      dispatch(updateAssignment(assignment));
+    } else {
+      // Creating new
+      dispatch(addAssignment(assignment));
+    }
+    // Navigate back to the Assignments list
+    navigate(`/Kambaz/Courses/${cid}/Assignments`);
+  };
+
+  const handleCancel = () => {
+    navigate(`/Kambaz/Courses/${cid}/Assignments`);
+  };
 
   return (
     <Container fluid className="wd-main-content">
-      <h2 className="mb-4">{assignment.title}</h2> {/* Display assignment title */}
-
+      <h3>{existing ? "Edit Assignment" : "New Assignment"}</h3>
       <Form>
-        {/* Assignment Title */}
-        <Form.Group controlId="assignmentTitle">
-          <Form.Label>Assignment Title</Form.Label>
-          <Form.Control type="text" defaultValue={assignment.title} />
+        {/* Name */}
+        <Form.Group className="mb-3">
+          <Form.Label>Assignment Name</Form.Label>
+          <Form.Control
+            type="text"
+            value={assignment.name}
+            onChange={(e) => handleChange("name", e.target.value)}
+          />
         </Form.Group>
 
-        {/* Assignment Instructions */}
-        <Form.Group controlId="assignmentInstructions" className="mt-3">
-          <Form.Text className="text-muted">
-            <p>
-              The assignment is <span className="text-danger">available online</span>.
-            </p>
-            <p>Submit a link to the landing page of your Web application running on <a href="#">Netlify</a>.</p>
-            <p>The landing page should include:</p>
-            <ul>
-              <li>Your full name and section</li>
-              <li>Links to each of the lab assignments</li>
-              <li>Link to the Kanbas application</li>
-              <li>Links to all relevant source code repositories</li>
-            </ul>
-          </Form.Text>
+        {/* Description */}
+        <Form.Group className="mb-3">
+          <Form.Label>Description</Form.Label>
+          <Form.Control
+            as="textarea"
+            rows={3}
+            value={assignment.description}
+            onChange={(e) => handleChange("description", e.target.value)}
+          />
         </Form.Group>
 
         {/* Points */}
-        <Row className="mt-4">
-          <Col md={6}>
-            <Form.Group controlId="points">
-              <Form.Label>Points</Form.Label>
-              <Form.Control type="number" placeholder="100" />
-            </Form.Group>
-          </Col>
-
-          <Col md={6}>
-            <Form.Group controlId="assignmentGroup">
-              <Form.Label>Assignment Group</Form.Label>
-              <Form.Select>
-                <option>ASSIGNMENTS</option>
-              </Form.Select>
-            </Form.Group>
-          </Col>
-        </Row>
-
-        {/* Display Grade */}
-        <Form.Group controlId="displayGrade" className="mt-3">
-          <Form.Label>Display Grade as</Form.Label>
-          <Form.Select>
-            <option>Percentage</option>
-          </Form.Select>
+        <Form.Group className="mb-3">
+          <Form.Label>Points</Form.Label>
+          <Form.Control
+            type="number"
+            value={assignment.points}
+            onChange={(e) => handleChange("points", e.target.value)}
+          />
         </Form.Group>
 
-        {/* Submission Type */}
-        <Form.Group controlId="submissionType" className="mt-4">
-          <Form.Label>Submission Type</Form.Label>
-          <Form.Select>
-            <option>Online</option>
-          </Form.Select>
+        {/* Due Date */}
+        <Form.Group className="mb-3">
+          <Form.Label>Due Date</Form.Label>
+          <Form.Control
+            type="date"
+            value={assignment.dueDate}
+            onChange={(e) => handleChange("dueDate", e.target.value)}
+          />
         </Form.Group>
 
-        {/* Online Entry Options */}
-        <Form.Group controlId="onlineOptions" className="mt-3">
-          <Form.Label>Online Entry Options</Form.Label>
-          <Form.Check type="checkbox" label="Text Entry" />
-          <Form.Check type="checkbox" label="Website URL" defaultChecked />
-          <Form.Check type="checkbox" label="Media Recordings" />
-          <Form.Check type="checkbox" label="Student Annotation" />
-          <Form.Check type="checkbox" label="File Uploads" />
+        {/* Available From */}
+        <Form.Group className="mb-3">
+          <Form.Label>Available From</Form.Label>
+          <Form.Control
+            type="date"
+            value={assignment.availableFrom}
+            onChange={(e) => handleChange("availableFrom", e.target.value)}
+          />
         </Form.Group>
 
-        {/* Assign To */}
-        <Form.Group controlId="assignTo" className="mt-4">
-          <Form.Label>Assign To</Form.Label>
-          <Form.Control type="text" value="Everyone" readOnly />
+        {/* Available Until */}
+        <Form.Group className="mb-3">
+          <Form.Label>Available Until</Form.Label>
+          <Form.Control
+            type="date"
+            value={assignment.availableUntil}
+            onChange={(e) => handleChange("availableUntil", e.target.value)}
+          />
         </Form.Group>
 
-        {/* Due Date & Availability */}
-        <Row className="mt-3">
-          <Col md={6}>
-            <Form.Group controlId="dueDate">
-              <Form.Label>Due</Form.Label>
-              <Form.Control type="date" />
-            </Form.Group>
-          </Col>
-
-          <Col md={6}>
-            <Form.Group controlId="availableFrom">
-              <Form.Label>Available From</Form.Label>
-              <Form.Control type="date" />
-            </Form.Group>
-          </Col>
-        </Row>
-
-        {/* Save and Cancel Buttons */}
-        <div className="mt-4 d-flex justify-content-between">
-          <Link to={`/Kambaz/Courses/${cid}/Assignments`}>
-            <Button variant="secondary">Cancel</Button>
-          </Link>
-          <Button variant="danger">Save</Button>
+        {/* Buttons */}
+        <div className="d-flex justify-content-between mt-4">
+          <Button variant="secondary" onClick={handleCancel}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={handleSave}>
+            Save
+          </Button>
         </div>
       </Form>
     </Container>

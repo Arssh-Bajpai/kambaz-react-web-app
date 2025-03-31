@@ -1,3 +1,4 @@
+// src/Kambaz/Courses/index.tsx
 import { Routes, Route, useParams } from "react-router-dom";
 import CourseNavigation from "./Navigation";
 import Home from "./Home";
@@ -21,7 +22,7 @@ export default function Courses() {
   console.log("📚 courses array:", courses);
 
   // Find the course by ID
-  const course = cid 
+  const course = cid
     ? courses?.find((course) => {
         console.log("🔍 Checking course:", course._id.toString(), "against cid:", cid);
         return course._id.toString() === cid;
@@ -39,7 +40,7 @@ export default function Courses() {
       {/* Sidebar Navigation */}
       <div className="wd-sidebar">
         <h1 className="wd-course-title">{courseName}</h1>
-        {<CourseNavigation />}
+        <CourseNavigation />
       </div>
 
       {/* Main Content */}
@@ -47,8 +48,20 @@ export default function Courses() {
         <Routes>
           <Route path="Home" element={<Home />} />
           <Route path="Modules" element={<Modules />} />
+          
+          {/* Assignments list */}
           <Route path="Assignments" element={<Assignments />} />
-          <Route path="Assignments/:aid" element={<AssignmentEditor />} />
+
+          {/* Editor for creating a new assignment */}
+          <Route path="Assignments/editor" element={<AssignmentEditor />} />
+
+          {/* Editor for editing an existing assignment (with assignment ID) */}
+          <Route path="Assignments/editor/:aid" element={<AssignmentEditor />} />
+
+          {/* Alternatively, if you prefer the existing route for editing:
+               <Route path="Assignments/:aid" element={<AssignmentEditor />} />
+               just replace the above lines accordingly. */}
+          
           <Route path="People" element={<PeopleTable />} />
         </Routes>
       </div>
