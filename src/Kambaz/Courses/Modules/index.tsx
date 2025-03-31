@@ -1,64 +1,50 @@
 // Modules.tsx
-import React, { useState } from "react";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
-import KambazNavigation from "../../Navigation"; // Reuse your existing navigation
+import { useSelector, useDispatch } from "react-redux";
+import KambazNavigation from "../../Navigation"; // Your existing sidebar
 import ModulesControls from "./ModulesControls"; // Top controls row (with +Module button, etc.)
-import { v4 as uuidv4 } from "uuid";
-import { FaGripVertical, FaPen, FaTrash, FaCheck } from "react-icons/fa";
 import { Button } from "react-bootstrap";
+import { FaGripVertical, FaPen, FaTrash, FaCheck } from "react-icons/fa";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../../styles.css";
 
+// Import actions from your reducer file – adjust the path as needed
+import { addModule, deleteModule, updateModule } from "../Modules/reducer";
+
 export default function Modules() {
   const { cid } = useParams();
+  const dispatch = useDispatch();
 
-  // Local modules state
-  const [modules, setModules] = useState<any[]>([
-    {
-      id: uuidv4(),
-      title:
-        "Week 1, Lecture 1 - Course Introduction, Syllabus, Agenda",
-    },
-    { id: uuidv4(), title: "LEARNING OBJECTIVES" },
-    { id: uuidv4(), title: "Introduction to the course" },
-    { id: uuidv4(), title: "Learn what is Web Development" },
-  ]);
+  // Retrieve the modules array from your Redux store.
+  // (Ensure your store is configured so that state.modules.modules exists.)
+  const modules = useSelector((state: any) => state.modules.modules);
 
-  // For the ModuleEditor modal (controlled via ModulesControls)
+  // Local state for the new module name (used in the ModuleEditor modal)
   const [moduleName, setModuleName] = useState("");
 
-  // Function to add a module
-  const addModule = () => {
-    const newModule = {
-      id: uuidv4(),
-      title: moduleName.trim() || `New Module ${Date.now()}`,
-    };
-    setModules((prev) => [...prev, newModule]);
+  // Dispatch global addModule action
+  const handleAddModule = () => {
+    dispatch(addModule({ name: moduleName, course: cid }));
     setModuleName("");
   };
 
-  // Function to remove a module
-  const removeModule = (moduleId: string) => {
-    setModules((prev) => prev.filter((m) => m.id !== moduleId));
+  // Dispatch global deleteModule action
+  const handleRemoveModule = (moduleId: string) => {
+    dispatch(deleteModule(moduleId));
   };
 
-  // Function to update a module title
-  const updateModule = (moduleId: string) => {
-    const current = modules.find((m) => m.id === moduleId);
-    if (!current) return;
-    const newTitle = prompt("Update module title:", current.title);
+  // Dispatch global updateModule action
+  const handleUpdateModule = (module: any) => {
+    const newTitle = prompt("Update module title:", module.name);
     if (newTitle && newTitle.trim() !== "") {
-      setModules((prev) =>
-        prev.map((m) =>
-          m.id === moduleId ? { ...m, title: newTitle.trim() } : m
-        )
-      );
+      dispatch(updateModule({ ...module, name: newTitle.trim() }));
     }
   };
 
   return (
     <div id="wd-kambaz">
-      {/* LEFT SIDEBAR: Using the same navigation component */}
+      {/* LEFT SIDEBAR */}
       <KambazNavigation />
 
       {/* MAIN CONTENT AREA */}
@@ -68,46 +54,42 @@ export default function Modules() {
           <ModulesControls
             moduleName={moduleName}
             setModuleName={setModuleName}
-            addModule={addModule}
+            addModule={handleAddModule}
           />
         </div>
 
-        {/* Flex container: Modules List (left) and Course Status bar (right) */}
+        {/* Flex container with Modules List and Course Status Bar */}
         <div className="d-flex align-items-start">
           {/* LEFT COLUMN: Modules list */}
           <div className="flex-grow-1 me-4">
             <ul className="list-group">
-              {modules.map((module) => (
+              {modules.map((module: any) => (
                 <li
-                  key={module.id}
+                  key={module._id}
                   className="list-group-item d-flex justify-content-between align-items-center mb-2"
                 >
                   <div className="d-flex align-items-center">
-                    {/* Grip handle icon */}
                     <FaGripVertical
                       className="text-muted me-2"
                       style={{ cursor: "grab" }}
                     />
-                    <span>{module.title}</span>
+                    <span>{module.name}</span>
                   </div>
                   <div>
-                    {/* Edit icon */}
                     <FaPen
                       className="me-3 text-primary"
                       style={{ cursor: "pointer" }}
-                      onClick={() => updateModule(module.id)}
+                      onClick={() => handleUpdateModule(module)}
                     />
-                    {/* Delete icon */}
                     <FaTrash
                       className="me-3 text-danger"
                       style={{ cursor: "pointer" }}
-                      onClick={() => removeModule(module.id)}
+                      onClick={() => handleRemoveModule(module._id)}
                     />
-                    {/* Check icon */}
                     <FaCheck
                       className="text-success"
                       style={{ cursor: "pointer" }}
-                      // Add any action for the check icon if needed
+                      // Optionally, add an onClick action for the check icon here.
                     />
                   </div>
                 </li>
