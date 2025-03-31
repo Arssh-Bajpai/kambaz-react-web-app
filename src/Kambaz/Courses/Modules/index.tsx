@@ -1,56 +1,164 @@
+// Modules.tsx
+import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-import * as db from "../../Database";
-import { BsGripVertical } from "react-icons/bs"; // Drag icon
-import ModulesControl from "./ModulesControl"; // Import module control buttons
-import LessonControlButtons from "./LessonControlButtons"; // Import lesson controls
-import GreenCheckmark from "./GreenCheckmark"; // Import checkmark icon
-
-// Define TypeScript interfaces to match `modules.json`
-interface Lesson {
-  _id: string;
-  name: string;
-}
-
-interface Module {
-  _id: string;
-  name: string;
-  description: string;
-  course: string;
-  lessons?: Lesson[]; // Updated to correctly type lessons
-}
+import KambazNavigation from "../../Navigation"; // Reuse your existing navigation
+import ModulesControls from "./ModulesControls"; // Top controls row (with +Module button, etc.)
+import { v4 as uuidv4 } from "uuid";
+import { FaGripVertical, FaPen, FaTrash, FaCheck } from "react-icons/fa";
+import { Button } from "react-bootstrap";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "../../styles.css";
 
 export default function Modules() {
-  const { cid } = useParams(); // Get course ID from URL
-  const modules: Module[] = db.modules; // Get all modules from database
+  const { cid } = useParams();
+
+  // Local modules state
+  const [modules, setModules] = useState<any[]>([
+    {
+      id: uuidv4(),
+      title:
+        "Week 1, Lecture 1 - Course Introduction, Syllabus, Agenda",
+    },
+    { id: uuidv4(), title: "LEARNING OBJECTIVES" },
+    { id: uuidv4(), title: "Introduction to the course" },
+    { id: uuidv4(), title: "Learn what is Web Development" },
+  ]);
+
+  // For the ModuleEditor modal (controlled via ModulesControls)
+  const [moduleName, setModuleName] = useState("");
+
+  // Function to add a module
+  const addModule = () => {
+    const newModule = {
+      id: uuidv4(),
+      title: moduleName.trim() || `New Module ${Date.now()}`,
+    };
+    setModules((prev) => [...prev, newModule]);
+    setModuleName("");
+  };
+
+  // Function to remove a module
+  const removeModule = (moduleId: string) => {
+    setModules((prev) => prev.filter((m) => m.id !== moduleId));
+  };
+
+  // Function to update a module title
+  const updateModule = (moduleId: string) => {
+    const current = modules.find((m) => m.id === moduleId);
+    if (!current) return;
+    const newTitle = prompt("Update module title:", current.title);
+    if (newTitle && newTitle.trim() !== "") {
+      setModules((prev) =>
+        prev.map((m) =>
+          m.id === moduleId ? { ...m, title: newTitle.trim() } : m
+        )
+      );
+    }
+  };
 
   return (
-    <ul id="wd-modules" className="list-group rounded-0">
-      {modules
-        .filter((module) => module.course === cid) // Only show modules for the selected course
-        .map((module) => (
-          <li key={module._id} className="wd-module list-group-item p-0 mb-5 fs-5 border-gray">
-            <div className="wd-title p-3 ps-2 bg-secondary d-flex align-items-center justify-content-between">
-              <span className="d-flex align-items-center">
-                <BsGripVertical className="me-2 fs-3" /> {/* Drag icon */}
-                {module.name}
-              </span>
-              <ModulesControl /> {/* Module control buttons */}
-            </div>
+    <div id="wd-kambaz">
+      {/* LEFT SIDEBAR: Using the same navigation component */}
+      <KambazNavigation />
 
-            {/* Render lessons for each module, correctly accessing lesson names */}
-            <ul className="wd-lessons list-group rounded-0">
-              {module.lessons?.map((lesson) => (
-                <li key={lesson._id} className="wd-lesson list-group-item p-3 ps-1 d-flex justify-content-between">
-                  {lesson.name} {/* Now correctly accessing lesson name */}
-                  <span className="d-flex align-items-center">
-                    <GreenCheckmark /> {/* Add checkmark if lesson is completed */}
-                    <LessonControlButtons /> {/* Lesson control buttons */}
-                  </span>
+      {/* MAIN CONTENT AREA */}
+      <div className="wd-main-content">
+        {/* ModulesControls row at the top */}
+        <div className="mb-3">
+          <ModulesControls
+            moduleName={moduleName}
+            setModuleName={setModuleName}
+            addModule={addModule}
+          />
+        </div>
+
+        {/* Flex container: Modules List (left) and Course Status bar (right) */}
+        <div className="d-flex align-items-start">
+          {/* LEFT COLUMN: Modules list */}
+          <div className="flex-grow-1 me-4">
+            <ul className="list-group">
+              {modules.map((module) => (
+                <li
+                  key={module.id}
+                  className="list-group-item d-flex justify-content-between align-items-center mb-2"
+                >
+                  <div className="d-flex align-items-center">
+                    {/* Grip handle icon */}
+                    <FaGripVertical
+                      className="text-muted me-2"
+                      style={{ cursor: "grab" }}
+                    />
+                    <span>{module.title}</span>
+                  </div>
+                  <div>
+                    {/* Edit icon */}
+                    <FaPen
+                      className="me-3 text-primary"
+                      style={{ cursor: "pointer" }}
+                      onClick={() => updateModule(module.id)}
+                    />
+                    {/* Delete icon */}
+                    <FaTrash
+                      className="me-3 text-danger"
+                      style={{ cursor: "pointer" }}
+                      onClick={() => removeModule(module.id)}
+                    />
+                    {/* Check icon */}
+                    <FaCheck
+                      className="text-success"
+                      style={{ cursor: "pointer" }}
+                      // Add any action for the check icon if needed
+                    />
+                  </div>
                 </li>
-              )) || <li className="list-group-item p-3 ps-1 text-muted">No lessons available</li>}
+              ))}
             </ul>
-          </li>
-        ))}
-    </ul>
+          </div>
+
+          {/* RIGHT COLUMN: Course Status Bar */}
+          <div style={{ width: "250px" }}>
+            <h3>Course Status</h3>
+            <Button variant="secondary" className="mb-2" size="sm">
+              Unpublish
+            </Button>
+            <Button variant="success" className="mb-2 ms-2" size="sm">
+              Publish
+            </Button>
+            <ul style={{ listStyle: "none", padding: 0 }}>
+              <li>
+                <Button variant="light" size="sm" className="mt-1">
+                  Import Existing Content
+                </Button>
+              </li>
+              <li>
+                <Button variant="light" size="sm" className="mt-1">
+                  Choose Home Page
+                </Button>
+              </li>
+              <li>
+                <Button variant="light" size="sm" className="mt-1">
+                  New Syllabus
+                </Button>
+              </li>
+              <li>
+                <Button variant="light" size="sm" className="mt-1">
+                  New Announcements
+                </Button>
+              </li>
+              <li>
+                <Button variant="light" size="sm" className="mt-1">
+                  New Analytics
+                </Button>
+              </li>
+              <li>
+                <Button variant="light" size="sm" className="mt-1">
+                  View Course Notifications
+                </Button>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

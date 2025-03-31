@@ -4,30 +4,34 @@ import Dashboard from "./Kambaz/Dashboard";
 import Account from "./Kambaz/Account";
 import Courses from "./Kambaz/Courses";
 import Labs from "./Labs"; // Labs Homepage
+import store from "./Kambaz/store";
+import { Provider } from "react-redux";
 
 export default function App() {
   return (
-    <Router>
-      <div className="d-flex">
-        {/* Sidebar Navigation */}
-        <KambazNavigation />
+    <Provider store={store}>
+      <Router>
+        <div className="d-flex">
+          {/* Sidebar Navigation */}
+          <KambazNavigation />
 
-        {/* Main Content */}
-        <div className="wd-main-content" style={{ marginLeft: "220px", padding: "20px", flex: 1 }}>
-          <Routes>
-            {/* Default Route - Load Dashboard First */}
-            <Route path="/" element={<Navigate to="/Kambaz/Dashboard" replace />} />
+          {/* Main Content */}
+          <div className="wd-main-content" style={{ marginLeft: "220px", padding: "20px", flex: 1 }}>
+            <Routes>
+              {/* Default Route - Load Dashboard First */}
+              <Route path="/" element={<Navigate to="/Kambaz/Dashboard" replace />} />
 
-            {/* Top-level Routes */}
-            <Route path="/Kambaz/Dashboard" element={<Dashboard />} />
-            <Route path="/Kambaz/Account/*" element={<Account />} />
-            <Route path="/Labs/*" element={<Labs />} />
+              {/* Top-level Routes */}
+              <Route path="/Kambaz/Dashboard" element={<Dashboard />} />
+              <Route path="/Kambaz/Account/*" element={<Account />} />
+              <Route path="/Labs/*" element={<Labs />} />
 
-            {/* Updated Courses Route with `:cid` */}
-            <Route path="/Kambaz/Courses/:cid/*" element={<Courses />} />
-          </Routes>
+              {/* Updated Courses Route with `:cid` */}
+              <Route path="/Kambaz/Courses/:cid/*" element={<Courses />} />
+            </Routes>
+          </div>
         </div>
-      </div>
-    </Router>
+      </Router>
+    </Provider>
   );
 }
