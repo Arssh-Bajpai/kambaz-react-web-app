@@ -4,9 +4,10 @@ import CourseNavigation from "./Navigation";
 import Home from "./Home";
 import Modules from "./Modules";
 import Assignments from "./Assignments";
-import AssignmentEditor from "./Assignments/Editor";
+// Remove AssignmentEditor import if it’s only used as a modal within Assignments
+// import AssignmentEditor from "./Assignments/Editor";
 import PeopleTable from "./People/Table";
-import "../styles.css"; // Ensure styles exist
+import "../styles.css";
 import { courses } from "../Database";
 
 export default function Courses() {
@@ -48,20 +49,8 @@ export default function Courses() {
         <Routes>
           <Route path="Home" element={<Home />} />
           <Route path="Modules" element={<Modules />} />
-          
-          {/* Assignments list */}
-          <Route path="Assignments" element={<Assignments />} />
-
-          {/* Editor for creating a new assignment */}
-          <Route path="Assignments/editor" element={<AssignmentEditor />} />
-
-          {/* Editor for editing an existing assignment (with assignment ID) */}
-          <Route path="Assignments/editor/:aid" element={<AssignmentEditor />} />
-
-          {/* Alternatively, if you prefer the existing route for editing:
-               <Route path="Assignments/:aid" element={<AssignmentEditor />} />
-               just replace the above lines accordingly. */}
-          
+          {/* Only one route for Assignments - the modal for editing is handled internally */}
+          <Route path="Assignments/*" element={<Assignments />} />
           <Route path="People" element={<PeopleTable />} />
         </Routes>
       </div>

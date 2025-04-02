@@ -1,25 +1,24 @@
-// src/Kambaz/Courses/Assignments/AssignmentEditor.tsx
 import { useState, useEffect } from "react";
-import { Container, Form, Button } from "react-bootstrap";
+import { Modal, Button, Form } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
-import { useParams, useNavigate } from "react-router-dom";
-import { addAssignment, updateAssignment } from "./reducer";
+import { updateAssignment, closeAssignmentEditor } from "./reducer";
+import { Assignment } from "./reducer";
 
-export default function AssignmentEditor() {
-  const { cid, aid } = useParams(); // course ID, assignment ID
+interface AssignmentEditorProps {
+  show: boolean;
+  handleClose: () => void;
+}
+
+export default function AssignmentEditor({ show, handleClose }: AssignmentEditorProps) {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+  // Correctly reference the UI slice under "assignments"
+  const assignmentToEdit = useSelector(
+    (state: any) => state.assignments.ui.assignmentToEdit
+  ) as Assignment | null;
 
-  // All assignments from Redux
-  const assignments = useSelector((state: any) => state.assignments.assignments);
-  // If we have an assignment ID, find that assignment
-  const existing = assignments.find(
-    (a: any) => a._id === aid && a.course === cid
-  );
-
-  // Local state for assignment form fields
-  const [assignment, setAssignment] = useState<any>({
-    course: cid,
+  const [assignment, setAssignment] = useState<Assignment>({
+    _id: "",
+    course: "",
     name: "",
     description: "",
     points: 100,
@@ -28,107 +27,50 @@ export default function AssignmentEditor() {
     availableUntil: "",
   });
 
+  // Whenever assignmentToEdit changes, sync local state
   useEffect(() => {
-    if (existing) {
-      setAssignment(existing);
+    if (assignmentToEdit) {
+      setAssignment(assignmentToEdit);
     }
-  }, [existing]);
+  }, [assignmentToEdit]);
 
-  const handleChange = (field: string, value: any) => {
-    setAssignment((prev: any) => ({ ...prev, [field]: value }));
+  const handleChange = (field: keyof Assignment, value: any) => {
+    setAssignment((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSave = () => {
-    if (existing) {
-      // Updating existing
+    if (assignment._id) {
       dispatch(updateAssignment(assignment));
-    } else {
-      // Creating new
-      dispatch(addAssignment(assignment));
     }
-    // Navigate back to the Assignments list
-    navigate(`/Kambaz/Courses/${cid}/Assignments`);
-  };
-
-  const handleCancel = () => {
-    navigate(`/Kambaz/Courses/${cid}/Assignments`);
+    dispatch(closeAssignmentEditor());
   };
 
   return (
-    <Container fluid className="wd-main-content">
-      <h3>{existing ? "Edit Assignment" : "New Assignment"}</h3>
-      <Form>
-        {/* Name */}
-        <Form.Group className="mb-3">
-          <Form.Label>Assignment Name</Form.Label>
-          <Form.Control
-            type="text"
-            value={assignment.name}
-            onChange={(e) => handleChange("name", e.target.value)}
-          />
-        </Form.Group>
-
-        {/* Description */}
-        <Form.Group className="mb-3">
-          <Form.Label>Description</Form.Label>
-          <Form.Control
-            as="textarea"
-            rows={3}
-            value={assignment.description}
-            onChange={(e) => handleChange("description", e.target.value)}
-          />
-        </Form.Group>
-
-        {/* Points */}
-        <Form.Group className="mb-3">
-          <Form.Label>Points</Form.Label>
-          <Form.Control
-            type="number"
-            value={assignment.points}
-            onChange={(e) => handleChange("points", e.target.value)}
-          />
-        </Form.Group>
-
-        {/* Due Date */}
-        <Form.Group className="mb-3">
-          <Form.Label>Due Date</Form.Label>
-          <Form.Control
-            type="date"
-            value={assignment.dueDate}
-            onChange={(e) => handleChange("dueDate", e.target.value)}
-          />
-        </Form.Group>
-
-        {/* Available From */}
-        <Form.Group className="mb-3">
-          <Form.Label>Available From</Form.Label>
-          <Form.Control
-            type="date"
-            value={assignment.availableFrom}
-            onChange={(e) => handleChange("availableFrom", e.target.value)}
-          />
-        </Form.Group>
-
-        {/* Available Until */}
-        <Form.Group className="mb-3">
-          <Form.Label>Available Until</Form.Label>
-          <Form.Control
-            type="date"
-            value={assignment.availableUntil}
-            onChange={(e) => handleChange("availableUntil", e.target.value)}
-          />
-        </Form.Group>
-
-        {/* Buttons */}
-        <div className="d-flex justify-content-between mt-4">
-          <Button variant="secondary" onClick={handleCancel}>
-            Cancel
-          </Button>
-          <Button variant="danger" onClick={handleSave}>
-            Save
-          </Button>
-        </div>
-      </Form>
-    </Container>
+    <Modal show={show} onHide={handleClose} backdrop="static" centered>
+      <Modal.Header closeButton>
+        <Modal.Title>Edit Assignment</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <Form>
+          <Form.Group className="mb-3">
+            <Form.Label>Assignment Name</Form.Label>
+            <Form.Control
+              type="text"
+              value={assignment.name}
+              onChange={(e) => handleChange("name", e.target.value)}
+            />
+          </Form.Group>
+          {/* ... more fields ... */}
+        </Form>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="secondary" onClick={handleClose}>
+          Cancel
+        </Button>
+        <Button variant="primary" onClick={handleSave}>
+          Save
+        </Button>
+      </Modal.Footer>
+    </Modal>
   );
 }

@@ -1,16 +1,14 @@
-// src/Kambaz/store.ts
-import { configureStore } from "@reduxjs/toolkit";
-import modulesReducer from "./Courses/Modules/reducer";
+// store.ts
+import { configureStore, combineReducers } from "@reduxjs/toolkit";
+import assignmentsReducer from "./Courses/Assignments/reducer"; // combined slices
 import accountReducer from "./Account/reducer";
-import assignmentsReducer from "./Courses/Assignments/reducer";
+import modulesReducer from "./Courses/Modules/reducer";
 
-const store = configureStore({
-  reducer: {
-    account: accountReducer,
-    modules: modulesReducer,
-    assignments: assignmentsReducer, // added assignments slice
-    // add other reducers as needed
-  },
+const rootReducer = combineReducers({
+  account: accountReducer,
+  modules: modulesReducer,
+  assignments: assignmentsReducer, // the combined reducer is at `state.assignments`
 });
 
+const store = configureStore({ reducer: rootReducer });
 export default store;
