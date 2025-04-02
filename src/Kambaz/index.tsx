@@ -2,8 +2,9 @@
 
 import { Routes, Route, useParams } from "react-router-dom";
 import CourseNavigation from "./Navigation";
-import Home from "./Home";         // If there's a folder named "Home" with index.tsx
-import Modules from "./Modules";   // Same for "Modules" folder
+import Home from "./Courses/Home";       
+import Modules from "./Courses/Modules"
+import Dashboard from "./Dashboard"
 import "../styles.css";
 
 export default function Courses() {
