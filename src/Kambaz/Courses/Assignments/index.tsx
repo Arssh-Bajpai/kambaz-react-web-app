@@ -1,4 +1,3 @@
-// src/Kambaz/Courses/Assignments/index.tsx
 import { useSelector, useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
 import { Container, Row, Col, Form, Button, ListGroup } from "react-bootstrap";
@@ -40,11 +39,17 @@ export default function Assignments() {
 
   return (
     <Container fluid className="wd-main-content">
+      {/* Conditionally render modals instead of passing a `show` prop */}
       {showCreator && (
-        <Creator cid={cid} handleClose={() => dispatch(closeAssignmentCreator())} />
+        <Creator
+          cid={cid}
+          handleClose={() => dispatch(closeAssignmentCreator())}
+        />
       )}
       {showEditor && (
-        <AssignmentEditor handleClose={() => dispatch(closeAssignmentEditor())} />
+        <AssignmentEditor
+          handleClose={() => dispatch(closeAssignmentEditor())}
+        />
       )}
 
       <Row className="mb-3 align-items-center">

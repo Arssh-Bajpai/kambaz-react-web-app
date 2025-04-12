@@ -5,15 +5,13 @@ import { useDispatch } from "react-redux";
 import { addAssignment } from "./reducer";
 
 interface CreatorProps {
-  show: boolean;
   handleClose: () => void;
-  cid: string | undefined; // Course ID
+  cid: string | undefined;
 }
 
-export default function Creator({ show, handleClose, cid }: CreatorProps) {
+export default function Creator({ handleClose, cid }: CreatorProps) {
   const dispatch = useDispatch();
 
-  // Local form state
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [points, setPoints] = useState<number>(100);
@@ -23,6 +21,7 @@ export default function Creator({ show, handleClose, cid }: CreatorProps) {
 
   const handleSave = () => {
     if (!cid) return;
+
     dispatch(
       addAssignment({
         course: cid,
@@ -34,19 +33,18 @@ export default function Creator({ show, handleClose, cid }: CreatorProps) {
         availableUntil,
       })
     );
-    // Clear the form
+
     setName("");
     setDescription("");
     setPoints(100);
     setDueDate("");
     setAvailableFrom("");
     setAvailableUntil("");
-    // Close the modal
     handleClose();
   };
 
   return (
-    <Modal show={show} onHide={handleClose} backdrop="static" centered>
+    <Modal show={true} onHide={handleClose} backdrop="static" centered>
       <Modal.Header closeButton>
         <Modal.Title>New Assignment</Modal.Title>
       </Modal.Header>
