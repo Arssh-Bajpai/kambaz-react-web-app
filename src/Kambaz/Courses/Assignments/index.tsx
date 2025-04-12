@@ -40,18 +40,12 @@ export default function Assignments() {
 
   return (
     <Container fluid className="wd-main-content">
-      {/* Assignment Creation Modal */}
-      <Creator
-        show={showCreator}
-        handleClose={() => dispatch(closeAssignmentCreator())}
-        cid={cid}
-      />
-
-      {/* Assignment Editor Modal */}
-      <AssignmentEditor
-        show={showEditor}
-        handleClose={() => dispatch(closeAssignmentEditor())}
-      />
+      {showCreator && (
+        <Creator cid={cid} handleClose={() => dispatch(closeAssignmentCreator())} />
+      )}
+      {showEditor && (
+        <AssignmentEditor handleClose={() => dispatch(closeAssignmentEditor())} />
+      )}
 
       <Row className="mb-3 align-items-center">
         <Col xs={12} md={6}>
