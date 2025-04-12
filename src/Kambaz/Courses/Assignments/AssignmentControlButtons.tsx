@@ -10,7 +10,7 @@ interface AssignmentLessonControlButtonsProps {
 
 const AssignmentLessonControlButtons: React.FC<
   AssignmentLessonControlButtonsProps
-> = ({ assignmentId, onDelete }) => {
+> = ({ assignmentId }) => {
   const handleDelete = () => {
     const modal = document.getElementById("wd-delete-assignment-dialog");
     if (modal) {

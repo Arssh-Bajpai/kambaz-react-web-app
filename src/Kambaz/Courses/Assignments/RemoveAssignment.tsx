@@ -1,6 +1,6 @@
 import { useDispatch } from "react-redux";
 import { deleteAssignment } from "./reducer";
-import * as assignmentClient from "../client"
+import * as assignmentClient from "./client"
 
 const RemoveAssignmentModal = () => {
   const dispatch = useDispatch();
