@@ -1,7 +1,6 @@
-// src/Kambaz/Courses/Assignments/reducer.ts
-import { createSlice, PayloadAction, combineReducers } from "@reduxjs/toolkit";
+// src/Kambaz/Courses/Assignments/reducer.tsx
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { v4 as uuidv4 } from "uuid";
-import initialAssignmentsData from "../../Database/assignments";
 
 // -----------------------
 // Assignment Interface
@@ -18,29 +17,41 @@ export interface Assignment {
 }
 
 // -----------------------
-// Assignments Slice
+// State Interfaces
 // -----------------------
 interface AssignmentsState {
   assignments: Assignment[];
 }
 
-const initialAssignmentsState: AssignmentsState = {
-  assignments: (initialAssignmentsData as any[]).map((item) => ({
-    _id: item._id,
-    name: item.title || item.name || "Untitled Assignment",
-    course: item.course || "",
-    description: item.description || "",
-    points: item.points || 100,
-    dueDate: item.dueDate || "",
-    availableFrom: item.availableFrom || "",
-    availableUntil: item.availableUntil || "",
-  })),
+interface UIState {
+  showAssignmentCreator: boolean;
+  showAssignmentEditor: boolean;
+  assignmentToEdit: Assignment | null;
+  assignmentSearchTerm: string;
+}
+
+// Combined state for the assignments module
+export interface AssignmentsModuleState extends AssignmentsState, UIState {}
+
+// -----------------------
+// Initial State
+// -----------------------
+const initialState: AssignmentsModuleState = {
+  assignments: [], // Removed database import dependency
+  showAssignmentCreator: false,
+  showAssignmentEditor: false,
+  assignmentToEdit: null,
+  assignmentSearchTerm: "",
 };
 
-const assignmentsSlice = createSlice({
+// -----------------------
+// Combined Slice
+// -----------------------
+const assignmentsReducer = createSlice({
   name: "assignments",
-  initialState: initialAssignmentsState,
+  initialState,
   reducers: {
+    // Data reducers
     addAssignment: (
       state,
       action: PayloadAction<Partial<Assignment> & { course: string }>
@@ -63,6 +74,7 @@ const assignmentsSlice = createSlice({
         availableFrom: action.payload.availableFrom || "",
         availableUntil: action.payload.availableUntil || "",
       };
+
       state.assignments.push(newAssignment);
     },
     updateAssignment: (state, action: PayloadAction<Assignment>) => {
@@ -75,30 +87,7 @@ const assignmentsSlice = createSlice({
         (a) => a._id !== action.payload
       );
     },
-  },
-});
-
-// -----------------------
-// UI Slice
-// -----------------------
-interface UIState {
-  showAssignmentCreator: boolean;
-  showAssignmentEditor: boolean;
-  assignmentToEdit: Assignment | null;
-  assignmentSearchTerm: string;
-}
-
-const initialUIState: UIState = {
-  showAssignmentCreator: false,
-  showAssignmentEditor: false,
-  assignmentToEdit: null,
-  assignmentSearchTerm: "",
-};
-
-const uiSlice = createSlice({
-  name: "ui",
-  initialState: initialUIState,
-  reducers: {
+    // UI reducers
     openAssignmentCreator(state) {
       state.showAssignmentCreator = true;
     },
@@ -119,22 +108,17 @@ const uiSlice = createSlice({
   },
 });
 
-// Export assignment and UI actions if needed:
-export const { addAssignment, updateAssignment, deleteAssignment } =
-  assignmentsSlice.actions;
+// Export actions to be used in your UI components
 export const {
+  addAssignment,
+  updateAssignment,
+  deleteAssignment,
   openAssignmentCreator,
   closeAssignmentCreator,
   openAssignmentEditor,
   closeAssignmentEditor,
   setAssignmentSearchTerm,
-} = uiSlice.actions;
+} = assignmentsReducer.actions;
 
-// Combine both slices into a single reducer
-const combinedReducer = combineReducers({
-  assignments: assignmentsSlice.reducer,
-  ui: uiSlice.reducer,
-});
-
-// Export the combined reducer as default
-export default combinedReducer;
+// Export the reducer as default
+export default assignmentsReducer.reducer;

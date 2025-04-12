@@ -5,7 +5,7 @@ import storage from "redux-persist/lib/storage"; // uses localStorage for web
 import accountReducer from "./Account/reducer";
 import modulesReducer from "./Courses/Modules/reducer.tsx";
 import coursesReducer from "./Courses/reducer";
-import assignmentsReducer from "./Courses/Assignments/reducer";
+import assignmentsReducer from "./Courses/Assignments/reducer.tsx";
 
 // Combine your reducers into a root reducer
 const rootReducer = combineReducers({

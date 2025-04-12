@@ -1,4 +1,4 @@
-// ModuleEditor.tsx
+// src/Kambaz/Courses/ModuleEditor.tsx
 import { Modal, FormControl, Button } from "react-bootstrap";
 
 interface ModuleEditorProps {
@@ -47,4 +47,3 @@ export default function ModuleEditor({
     </Modal>
   );
 }
-

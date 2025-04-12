@@ -1,4 +1,4 @@
-// ModulesControls.tsx
+// src/Kambaz/Courses/ModulesControls.tsx
 import { useState } from "react";
 import { Button, Dropdown } from "react-bootstrap";
 import { FaPlus } from "react-icons/fa6";

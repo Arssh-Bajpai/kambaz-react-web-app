@@ -25,4 +25,8 @@ export const deleteCourse = async (id: string) => {
     );
     return response.data;
   };
+
+export function createAssignment(arg0: { course: string; name: string; description: string; points: number; dueDate: string; availableFrom: string; availableUntil: string; }) {
+  throw new Error("Function not implemented.");
+}
   
