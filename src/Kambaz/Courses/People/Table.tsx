@@ -1,7 +1,7 @@
 import { Table } from "react-bootstrap";
 import { FaUserCircle } from "react-icons/fa";
 import { useParams } from "react-router-dom";
-import enrollments from "../../Database/enrollments.json"; // Import enrollments
+import enrollments from "../Database/enrollments.json"; // Import enrollments
 
 export default function PeopleTable() {
   const { cid } = useParams(); // Get course ID from URL

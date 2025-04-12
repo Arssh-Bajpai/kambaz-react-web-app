@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { setCurrentUser } from "./reducer";
 import { useDispatch } from "react-redux";
-import * as db from "../Database";
+import * as client from "./client";
 import { Button, FormControl } from "react-bootstrap";
 
 export default function Signin() {
@@ -11,11 +11,9 @@ export default function Signin() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const signin = () => {
+  const signin = async () => {
     // Compare the input with the "user" property
-    const user = db.users.find(
-      (u: any) => u.user === credentials.username && u.user === credentials.password
-    );
+    const user = await client.signin(credentials);
     if (!user) {
       alert("Invalid username or password");
       return;

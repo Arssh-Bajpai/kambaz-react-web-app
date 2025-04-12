@@ -3,7 +3,7 @@ import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from "redux-persist";
 import storage from "redux-persist/lib/storage"; // uses localStorage for web
 import accountReducer from "./Account/reducer";
-import modulesReducer from "./Courses/Modules/reducer";
+import modulesReducer from "./Courses/Modules/reducer.tsx";
 import coursesReducer from "./Courses/reducer";
 import assignmentsReducer from "./Courses/Assignments/reducer";
 

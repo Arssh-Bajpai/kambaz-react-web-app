@@ -1,4 +1,4 @@
-[
+export default [
   {
     "_id": "RS101",
     "name": "Rocket Propulsion",

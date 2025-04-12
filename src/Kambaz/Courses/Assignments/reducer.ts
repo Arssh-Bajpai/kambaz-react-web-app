@@ -1,7 +1,7 @@
 // src/Kambaz/Courses/Assignments/reducer.ts
 import { createSlice, PayloadAction, combineReducers } from "@reduxjs/toolkit";
 import { v4 as uuidv4 } from "uuid";
-import initialAssignmentsData from "../../Database/assignments.json";
+import initialAssignmentsData from "../../Database/assignments";
 
 // -----------------------
 // Assignment Interface
