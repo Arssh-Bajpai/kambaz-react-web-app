@@ -18,6 +18,7 @@ export default function Profile() {
     dispatch(setCurrentUser(updatedProfile));
   };
 
+
   const fetchProfile = () => {
     if (!currentUser) {
       navigate("/Kambaz/Account/Signin");

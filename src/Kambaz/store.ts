@@ -4,7 +4,7 @@ import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, 
 import storage from "redux-persist/lib/storage"; // uses localStorage for web
 import accountReducer from "./Account/reducer";
 import modulesReducer from "./Courses/Modules/reducer.tsx";
-import coursesReducer from "./Courses/reducer";
+import coursesReducer from "./Courses/reducer.tsx";
 import assignmentsReducer from "./Courses/Assignments/reducer.tsx";
 
 // Combine your reducers into a root reducer

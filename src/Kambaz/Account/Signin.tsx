@@ -12,15 +12,12 @@ export default function Signin() {
   const navigate = useNavigate();
 
   const signin = async () => {
-    // Compare the input with the "user" property
-    const user = await client.signin(credentials);
-    if (!user) {
-      alert("Invalid username or password");
-      return;
-    }
+    const user =  await client.signin(credentials);
+    if (!user) return;
     dispatch(setCurrentUser(user));
     navigate("/Kambaz/Dashboard");
   };
+
 
   return (
     <div id="wd-signin-screen">
