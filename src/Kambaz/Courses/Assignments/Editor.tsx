@@ -1,76 +1,153 @@
-import { useState, useEffect } from "react";
-import { Modal, Button, Form } from "react-bootstrap";
-import { useSelector, useDispatch } from "react-redux";
-import { updateAssignment, closeAssignmentEditor } from "./reducer";
-import { Assignment } from "./reducer";
+import { Form, Container, Row, Col, Button } from "react-bootstrap";
+import { useParams, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { useState } from "react";
 
-interface AssignmentEditorProps {
-  show: boolean;
-  handleClose: () => void;
-}
+export default function AssignmentEditor({ 
+    assignmentId, 
+    updateAssignment, 
+    handleClose
+}: { 
+    assignmentId?: string; 
+    updateAssignment: (assignment: any) => void; 
+    handleClose: () => void; 
+}) {
 
-export default function AssignmentEditor({ show, handleClose }: AssignmentEditorProps) {
-  const dispatch = useDispatch();
-  // Correctly reference the UI slice under "assignments"
-  const assignmentToEdit = useSelector(
-    (state: any) => state.assignments.ui.assignmentToEdit
-  ) as Assignment | null;
+    const { cid } = useParams();
+    const navigate = useNavigate();
+    const { currentUser } = useSelector((state: any) => state.accountReducer);
+    const isFaculty = currentUser?.role === "FACULTY";
+    
+    const [title, setTitle] = useState("");
+    const course = useState("");
+    const [description, setDescription] = useState("");
+    const [points, setPoints] = useState(100);
+    const [dueDate, setDueDate] = useState("2025-02-21");
+    const [availableFrom, setAvailableFrom] = useState("2025-02-20");
+    const [availableUntil, setAvailableUntil] = useState("2025-03-20");
 
-  const [assignment, setAssignment] = useState<Assignment>({
-    _id: "",
-    course: "",
-    name: "",
-    description: "",
-    points: 100,
-    dueDate: "",
-    availableFrom: "",
-    availableUntil: "",
-  });
+    const handleCancel = () => {
+        navigate(`/Kambaz/Courses/${cid}/Assignments`);
+        handleClose();
+    };
 
-  // Whenever assignmentToEdit changes, sync local state
-  useEffect(() => {
-    if (assignmentToEdit) {
-      setAssignment(assignmentToEdit);
-    }
-  }, [assignmentToEdit]);
+    const handleSave = () => {
+        updateAssignment({
+            _id: assignmentId, 
+            title, 
+            course 
+        });
+        navigate(`/Kambaz/Courses/${cid}/Assignments`);
+        handleClose();
+    };
 
-  const handleChange = (field: keyof Assignment, value: any) => {
-    setAssignment((prev) => ({ ...prev, [field]: value }));
-  };
+    return (
+        <Container id="wd-assignments-editor">
+            <h2>{assignmentId ? "Edit Assignment" : "Create Assignment"}</h2>
 
-  const handleSave = () => {
-    if (assignment._id) {
-      dispatch(updateAssignment(assignment));
-    }
-    dispatch(closeAssignmentEditor());
-  };
+            <Form>
+                <Row className="align-items-center">
+                    <Col xs={3}>
+                        <Form.Label>Assignment Name</Form.Label>
+                    </Col>
+                    <Col>
+                        <Form.Control
+                            type="text"
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            disabled={!isFaculty}
+                        />
+                    </Col>
+                </Row>
 
-  return (
-    <Modal show={show} onHide={handleClose} backdrop="static" centered>
-      <Modal.Header closeButton>
-        <Modal.Title>Edit Assignment</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Form>
-          <Form.Group className="mb-3">
-            <Form.Label>Assignment Name</Form.Label>
-            <Form.Control
-              type="text"
-              value={assignment.name}
-              onChange={(e) => handleChange("name", e.target.value)}
-            />
-          </Form.Group>
-          {/* ... more fields ... */}
-        </Form>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>
-          Cancel
-        </Button>
-        <Button variant="primary" onClick={handleSave}>
-          Save
-        </Button>
-      </Modal.Footer>
-    </Modal>
-  );
+                <Row className="align-items-center mt-2">
+                    <Col xs={3}>
+                        <Form.Label>Description</Form.Label>
+                    </Col>
+                    <Col>
+                        <Form.Control
+                            as="textarea"
+                            rows={4}
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            disabled={!isFaculty}
+                        />
+                    </Col>
+                </Row>
+
+                <Row className="align-items-center mt-2">
+                    <Col xs={3}>
+                        <Form.Label>Points</Form.Label>
+                    </Col>
+                    <Col>
+                        <Form.Control
+                            type="number"
+                            value={points}
+                            onChange={(e) => setPoints(Number(e.target.value))}
+                            disabled={!isFaculty}
+                        />
+                    </Col>
+                </Row>
+
+                <Row className="align-items-center mt-2">
+                    <Col xs={3}>
+                        <Form.Label>Due Date</Form.Label>
+                    </Col>
+                    <Col>
+                        <Form.Control
+                            type="date"
+                            value={dueDate}
+                            onChange={(e) => setDueDate(e.target.value)}
+                            disabled={!isFaculty}
+                        />
+                    </Col>
+                </Row>
+
+                <Row className="align-items-center mt-2">
+                    <Col xs={6}>
+                        <Form.Label>Available from</Form.Label>
+                    </Col>
+                    <Col xs={6}>
+                        <Form.Label>Until</Form.Label>
+                    </Col>
+                </Row>
+
+                <Row className="align-items-center">
+                    <Col xs={6}>
+                        <Form.Control
+                            type="date"
+                            value={availableFrom}
+                            onChange={(e) => setAvailableFrom(e.target.value)}
+                            disabled={!isFaculty}
+                        />
+                    </Col>
+                    <Col xs={6}>
+                        <Form.Control
+                            type="date"
+                            value={availableUntil}
+                            onChange={(e) => setAvailableUntil(e.target.value)}
+                            disabled={!isFaculty}
+                        />
+                    </Col>
+                </Row>
+
+                {isFaculty ? (
+                    <div className="mt-3">
+                        <Button onClick={handleSave} className="btn btn-primary me-2">
+                            Save
+                        </Button>
+                        <Button onClick={handleCancel} className="btn btn-secondary">
+                            Cancel
+                        </Button>
+                    </div>
+                ) : (
+                    <div className="mt-3">
+                        <Button onClick={handleCancel} className="btn btn-secondary">
+                            Back
+                        </Button>
+                    </div>
+                )}
+            </Form>
+        </Container>
+    );
 }
