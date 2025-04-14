@@ -1,124 +1,43 @@
-// src/Kambaz/Courses/Assignments/reducer.tsx
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
+import { assignments } from "../../Database";
 import { v4 as uuidv4 } from "uuid";
 
-// -----------------------
-// Assignment Interface
-// -----------------------
-export interface Assignment {
-  _id: string;
-  name: string;
-  course: string;
-  description: string;
-  points: number;
-  dueDate: string;
-  availableFrom: string;
-  availableUntil: string;
-}
-
-// -----------------------
-// State Interfaces
-// -----------------------
-interface AssignmentsState {
-  assignments: Assignment[];
-}
-
-interface UIState {
-  showAssignmentCreator: boolean;
-  showAssignmentEditor: boolean;
-  assignmentToEdit: Assignment | null;
-  assignmentSearchTerm: string;
-}
-
-// Combined state for the assignments module
-export interface AssignmentsModuleState extends AssignmentsState, UIState {}
-
-// -----------------------
-// Initial State
-// -----------------------
-const initialState: AssignmentsModuleState = {
-  assignments: [], // Removed database import dependency
-  showAssignmentCreator: false,
-  showAssignmentEditor: false,
-  assignmentToEdit: null,
-  assignmentSearchTerm: "",
+const initialState = {
+  assignments: assignments,
 };
 
-// -----------------------
-// Combined Slice
-// -----------------------
-const assignmentsReducer = createSlice({
+const assignmentsSlice = createSlice({
   name: "assignments",
   initialState,
   reducers: {
-    // Data reducers
-    addAssignment: (
-      state,
-      action: PayloadAction<Partial<Assignment> & { course: string }>
-    ) => {
-      const assignmentsForCourse = state.assignments.filter(
-        (a) => a.course === action.payload.course
-      );
-      const defaultName =
-        action.payload.name && action.payload.name.trim() !== ""
-          ? action.payload.name
-          : `Assignment ${assignmentsForCourse.length + 1}`;
-
-      const newAssignment: Assignment = {
+    addAssignment: (state, { payload: assignment }) => {
+      const newAssignment: any = {
         _id: uuidv4(),
-        course: action.payload.course,
-        name: defaultName,
-        description: action.payload.description || "",
-        points: action.payload.points || 100,
-        dueDate: action.payload.dueDate || "",
-        availableFrom: action.payload.availableFrom || "",
-        availableUntil: action.payload.availableUntil || "",
+        title: assignment.title,
+        description: assignment.description,
+        dueDate: assignment.dueDate,
+        course: assignment.course,
       };
-
-      state.assignments.push(newAssignment);
+      state.assignments = [...state.assignments, newAssignment] as any;
     },
-    updateAssignment: (state, action: PayloadAction<Assignment>) => {
-      state.assignments = state.assignments.map((a) =>
-        a._id === action.payload._id ? action.payload : a
-      );
-    },
-    deleteAssignment: (state, action: PayloadAction<string>) => {
+    deleteAssignment: (state, { payload: assignmentId }) => {
       state.assignments = state.assignments.filter(
-        (a) => a._id !== action.payload
+        (a: any) => a._id !== assignmentId
       );
     },
-    // UI reducers
-    openAssignmentCreator(state) {
-      state.showAssignmentCreator = true;
+    updateAssignment: (state, { payload: assignment }) => {
+      state.assignments = state.assignments.map((a: any) =>
+        a._id === assignment._id ? assignment : a
+      ) as any;
     },
-    closeAssignmentCreator(state) {
-      state.showAssignmentCreator = false;
-    },
-    openAssignmentEditor(state, action: PayloadAction<Assignment>) {
-      state.assignmentToEdit = action.payload;
-      state.showAssignmentEditor = true;
-    },
-    closeAssignmentEditor(state) {
-      state.showAssignmentEditor = false;
-      state.assignmentToEdit = null;
-    },
-    setAssignmentSearchTerm(state, action: PayloadAction<string>) {
-      state.assignmentSearchTerm = action.payload;
-    },
+    editAssignment: (state, { payload: assignmentId }) => {
+        state.assignments = state.assignments.map((m: any) =>
+          m._id === assignmentId ? { ...m, editing: true } : m
+        ) as any;
+      },
   },
 });
 
-// Export actions to be used in your UI components
-export const {
-  addAssignment,
-  updateAssignment,
-  deleteAssignment,
-  openAssignmentCreator,
-  closeAssignmentCreator,
-  openAssignmentEditor,
-  closeAssignmentEditor,
-  setAssignmentSearchTerm,
-} = assignmentsReducer.actions;
-
-// Export the reducer as default
-export default assignmentsReducer.reducer;
+export const { addAssignment, deleteAssignment, updateAssignment, editAssignment } =
+  assignmentsSlice.actions;
+export default assignmentsSlice.reducer;

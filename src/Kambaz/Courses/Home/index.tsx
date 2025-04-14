@@ -1,13 +1,14 @@
 import Modules from "../Modules";
-import "../../styles.css"; // Ensure your styles file is included
-
+import CourseStatus from "./Status";
 export default function Home() {
   return (
-    <div id="wd-course-home" className="d-flex flex-wrap">
-      {/* Main Modules Section - Takes most space */}
-      <div className="flex-grow-1 me-3">
-        <Modules />
-      </div>
-    </div>
-  );
-}
+    <div className="d-flex" id="wd-home">
+  <div className="flex-fill me-3">
+    <Modules />
+  </div>
+  <div className="d-none d-xl-block">
+    <CourseStatus />
+  </div>
+</div>
+
+);}

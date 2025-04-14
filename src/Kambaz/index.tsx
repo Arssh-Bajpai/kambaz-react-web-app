@@ -6,7 +6,7 @@ import Courses from "./Courses";
 import Account from "./Account";
 import { useEffect, useState } from "react";
 import ProtectedRoute from "./Account/ProtectedRoute";
-import Session from "./Account/Session"; // Updated import with proper casing
+import Session from "./Account/Session";
 import * as userClient from "./Account/client";
 import { useSelector } from "react-redux";
 import * as courseClient from "./Courses/client";
@@ -22,76 +22,39 @@ export default function Kambaz() {
     description: "New Description",
   });
 
-  // Get the currentUser from the account reducer in Redux.
   const { currentUser } = useSelector((state: any) => state.accountReducer);
-  
-  // Debugging: Log currentUser and courses whenever they change
-  useEffect(() => {
-    console.log("Current User:", currentUser);
-  }, [currentUser]);
 
-  useEffect(() => {
-    console.log("Courses updated:", courses);
-  }, [courses]);
-
-  // Debug: Fetch courses only if user is loaded
   const fetchCourses = async () => {
-    console.log("Fetching courses...");
     try {
-      const fetchedCourses = await userClient.findMyCourses();
-      console.log("Fetched courses:", fetchedCourses);
-      setCourses(fetchedCourses);
+      const courses = await userClient.findMyCourses();
+      setCourses(courses);
     } catch (error) {
-      console.error("Error fetching courses:", error);
+      console.error(error);
     }
   };
 
-  // Only fetch courses if the user is loaded
+  // ✅ Only fetch courses if user is loaded
   useEffect(() => {
     if (currentUser) {
       fetchCourses();
-    } else {
-      console.log("No currentUser, skipping fetchCourses");
     }
   }, [currentUser]);
 
-  // Debug: Add a new course and log the operation
   const addNewCourse = async () => {
-    console.log("Adding new course...");
-    try {
-      const newCourse = await userClient.createCourse(course);
-      console.log("New course created:", newCourse);
-      setCourses([...courses, newCourse]);
-    } catch (error) {
-      console.error("Error creating course:", error);
-    }
+    const newCourse = await userClient.createCourse(course);
+    setCourses([...courses, newCourse]);
   };
 
-  // Debug: Delete a course and log the operation
   const deleteCourse = async (courseId: string) => {
-    console.log("Deleting course with ID:", courseId);
-    try {
-      const status = await courseClient.deleteCourse(courseId);
-      console.log("Deleted course response:", status);
-      setCourses(courses.filter((course) => course._id !== courseId));
-    } catch (error) {
-      console.error("Error deleting course:", error);
-    }
+    setCourses(courses.filter((course) => course._id !== courseId));
   };
 
-  // Debug: Update a course and log the operation
   const updateCourse = async () => {
-    console.log("Updating course:", course);
-    try {
-      await courseClient.updateCourse(course);
-      console.log("Course updated:", course);
-      setCourses(courses.map((c) => (c._id === course._id ? course : c)));
-    } catch (error) {
-      console.error("Error updating course:", error);
-    }
+    await courseClient.updateCourse(course);
+    setCourses(
+      courses.map((c) => (c._id === course._id ? course : c))
+    );
   };
-
-  console.log("Rendering Kambaz component with courses:", courses);
 
   return (
     <Session>

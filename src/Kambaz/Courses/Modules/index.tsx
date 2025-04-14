@@ -1,146 +1,118 @@
-// Modules.tsx
-import { useState } from "react";
-import { useParams } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
-import KambazNavigation from "../../Navigation"; // Your existing sidebar
-import ModulesControls from "./ModulesControls"; // Top controls row (with +Module button, etc.)
-import { Button } from "react-bootstrap";
-import { FaGripVertical, FaPen, FaTrash, FaCheck } from "react-icons/fa";
-import "bootstrap/dist/css/bootstrap.min.css";
+import { useEffect, useState } from "react";
+import { ListGroup, FormControl } from "react-bootstrap";
+import { BsGripVertical, BsPencil, BsTrash, BsPlusCircle } from "react-icons/bs";
+import ModulesControls from "./ModulesControls";
+import LessonControlButtons from "./LessonControlButtons";
 import "../../styles.css";
-
-// Import actions from your reducer file – adjust the path as needed
-import { addModule, deleteModule, updateModule } from "../Modules/reducer";
+import { useParams } from "react-router";
+import { setModules, addModule, editModule, updateModule, deleteModule } from "./reducer";
+import * as coursesClient from "../client";
+import { useSelector, useDispatch } from "react-redux";
+import * as modulesClient from "./client";
 
 export default function Modules() {
   const { cid } = useParams();
   const dispatch = useDispatch();
 
-  // Retrieve the modules array from your Redux store.
-  // (Ensure your store is configured so that state.modules.modules exists.)
-  const modules = useSelector((state: any) => state.modules.modules);
-
-  // Local state for the new module name (used in the ModuleEditor modal)
   const [moduleName, setModuleName] = useState("");
 
-  // Dispatch global addModule action
-  const handleAddModule = () => {
-    dispatch(addModule({ name: moduleName, course: cid }));
-    setModuleName("");
+  const { modules } = useSelector((state: any) => state.modulesReducer);
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
+  const isFaculty = currentUser?.role === "FACULTY";
+
+  useEffect(() => {
+    const init = async () => {
+      const loadedModules = await coursesClient.findModulesForCourse(cid as string);
+      dispatch(setModules(loadedModules));
+    };
+    init();
+  }, [cid, dispatch]);
+
+  const createModule = async () => {
+    if (!cid || !moduleName.trim()) return;
+    const newModule = { name: moduleName, course: cid };
+    const created = await coursesClient.createModuleForCourse(cid, newModule);
+    dispatch(addModule(created));
   };
 
-  // Dispatch global deleteModule action
-  const handleRemoveModule = (moduleId: string) => {
+  const handleEdit = (moduleId: string) => dispatch(editModule(moduleId));
+
+  const handleRemove = async (moduleId: string) => {
+    await modulesClient.deleteModule(moduleId);
     dispatch(deleteModule(moduleId));
   };
 
-  // Dispatch global updateModule action
-  const handleUpdateModule = (module: any) => {
-    const newTitle = prompt("Update module title:", module.name);
-    if (newTitle && newTitle.trim() !== "") {
-      dispatch(updateModule({ ...module, name: newTitle.trim() }));
-    }
+  const handleSave = async (mod: any) => {
+    await modulesClient.updateModule(mod);
+    dispatch(updateModule(mod));
+  };
+
+  const renderLesson = (lesson: any) => (
+    <li key={lesson._id} className="wd-lesson list-group-item p-3 ps-2 bg-light rounded mb-2">
+      <BsGripVertical className="me-3 fs-4 text-muted" />
+      {lesson.name}
+      {isFaculty && <LessonControlButtons />}
+    </li>
+  );
+
+  const renderModule = (module: any) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      dispatch(updateModule({ ...module, name: e.target.value }));
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === "Enter") {
+        handleSave({ ...module, editing: false });
+      }
+    };
+
+    return (
+      <li key={module._id} className="wd-module list-group-item p-4 mb-4 fs-5 border-dark w-100">
+        <div className="wd-title p-3 ps-3 bg-light d-flex align-items-center justify-content-between rounded">
+          <div className="d-flex align-items-center flex-grow-1">
+            <BsGripVertical className="me-2 fs-4 text-dark" />
+            {module.editing && isFaculty ? (
+              <FormControl
+                className="w-75 d-inline-block form-control-sm"
+                defaultValue={module.name}
+                onChange={handleInputChange}
+                onKeyDown={handleKeyDown}
+              />
+            ) : (
+              <span className="fs-5 text-muted">{module.name}</span>
+            )}
+          </div>
+
+          {isFaculty && (
+            <div className="module-buttons d-flex justify-content-around align-items-center">
+              <BsPencil className="me-3 cursor-pointer text-success" onClick={() => handleEdit(module._id)} />
+              <BsTrash className="me-3 cursor-pointer text-danger" onClick={() => handleRemove(module._id)} />
+              <BsPlusCircle className="cursor-pointer text-primary" onClick={createModule} />
+            </div>
+          )}
+        </div>
+
+        {module.lessons && module.lessons.length > 0 && (
+          <ul className="wd-lessons list-group rounded-0">
+            {module.lessons.map(renderLesson)}
+          </ul>
+        )}
+      </li>
+    );
   };
 
   return (
-    <div id="wd-kambaz">
-      {/* LEFT SIDEBAR */}
-      <KambazNavigation />
-
-      {/* MAIN CONTENT AREA */}
-      <div className="wd-main-content">
-        {/* ModulesControls row at the top */}
-        <div className="mb-3">
-          <ModulesControls
-            moduleName={moduleName}
-            setModuleName={setModuleName}
-            addModule={handleAddModule}
-          />
-        </div>
-
-        {/* Flex container with Modules List and Course Status Bar */}
-        <div className="d-flex align-items-start">
-          {/* LEFT COLUMN: Modules list */}
-          <div className="flex-grow-1 me-4">
-            <ul className="list-group">
-              {modules.map((module: any) => (
-                <li
-                  key={module._id}
-                  className="list-group-item d-flex justify-content-between align-items-center mb-2"
-                >
-                  <div className="d-flex align-items-center">
-                    <FaGripVertical
-                      className="text-muted me-2"
-                      style={{ cursor: "grab" }}
-                    />
-                    <span>{module.name}</span>
-                  </div>
-                  <div>
-                    <FaPen
-                      className="me-3 text-primary"
-                      style={{ cursor: "pointer" }}
-                      onClick={() => handleUpdateModule(module)}
-                    />
-                    <FaTrash
-                      className="me-3 text-danger"
-                      style={{ cursor: "pointer" }}
-                      onClick={() => handleRemoveModule(module._id)}
-                    />
-                    <FaCheck
-                      className="text-success"
-                      style={{ cursor: "pointer" }}
-                      // Optionally, add an onClick action for the check icon here.
-                    />
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* RIGHT COLUMN: Course Status Bar */}
-          <div style={{ width: "250px" }}>
-            <h3>Course Status</h3>
-            <Button variant="secondary" className="mb-2" size="sm">
-              Unpublish
-            </Button>
-            <Button variant="success" className="mb-2 ms-2" size="sm">
-              Publish
-            </Button>
-            <ul style={{ listStyle: "none", padding: 0 }}>
-              <li>
-                <Button variant="light" size="sm" className="mt-1">
-                  Import Existing Content
-                </Button>
-              </li>
-              <li>
-                <Button variant="light" size="sm" className="mt-1">
-                  Choose Home Page
-                </Button>
-              </li>
-              <li>
-                <Button variant="light" size="sm" className="mt-1">
-                  New Syllabus
-                </Button>
-              </li>
-              <li>
-                <Button variant="light" size="sm" className="mt-1">
-                  New Announcements
-                </Button>
-              </li>
-              <li>
-                <Button variant="light" size="sm" className="mt-1">
-                  New Analytics
-                </Button>
-              </li>
-              <li>
-                <Button variant="light" size="sm" className="mt-1">
-                  View Course Notifications
-                </Button>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
+    <div className="wd-modules container-fluid">
+      {isFaculty && (
+        <ModulesControls
+          setModuleName={setModuleName}
+          moduleName={moduleName}
+          addModule={createModule}
+        />
+      )}
+      <ListGroup id="wd-modules" className="rounded-0 w-100">
+        {modules.map(renderModule)}
+      </ListGroup>
     </div>
   );
 }

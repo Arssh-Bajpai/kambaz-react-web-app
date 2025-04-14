@@ -1,123 +1,183 @@
-// src/Kambaz/Courses/Assignments/Editor.tsx
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Button, Container, Form, Row, Col, Spinner, Alert } from "react-bootstrap";
 import { useParams, useNavigate } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
-import { addAssignment, updateAssignment } from "./reducer";
+import { v4 as uuidv4 } from "uuid";
 import * as assignmentClient from "./client";
 
-type AssignmentEditorProps = {
-  handleClose: () => void;
-};
-
-export default function AssignmentEditor({ handleClose }: AssignmentEditorProps) {
+export default function AssignmentEditor() {
   const { aid, cid } = useParams();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { assignments } = useSelector((state: any) => state.assignmentReducer);
-  const existing = aid !== "new" ? assignments.find((a: any) => a._id === aid) : null;
 
-  const [assignment, setAssignment] = useState({
-    title: existing?.title || "",
-    description: existing?.description || "",
-    points: existing?.points || 100,
-    dueDate: existing?.dueDate || "",
-    availableFrom: existing?.availableFrom || "",
-    availableUntil: existing?.availableUntil || "",
+  const [assignment, setAssignment] = useState<any>({
+    _id: uuidv4(), title: "", description: "", points: "100", due: "", available: "", availableUntil: "", course: cid, module: "Multiple Modules",
   });
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isFormValid, setIsFormValid] = useState<boolean>(true);
 
-  const handleSave = async () => {
-    if (aid === "new") {
-      const created = await assignmentClient.createAssignment({
-        title: assignment.title,
-        course: cid,
-        description: assignment.description,
-        points: assignment.points,
-        dueDate: assignment.dueDate,
-        availableFrom: assignment.availableFrom,
-        availableUntil: assignment.availableUntil,
-      });
-      dispatch(addAssignment(created));
-    } else {
-      const updated = await assignmentClient.updateAssignment({
-        _id: aid,
-        title: assignment.title,
-        description: assignment.description,
-        points: assignment.points,
-        dueDate: assignment.dueDate,
-        availableFrom: assignment.availableFrom,
-        availableUntil: assignment.availableUntil,
-      });
-      dispatch(updateAssignment(updated));
+  // Fetch the assignment details if editing an existing assignment
+  useEffect(() => {
+    const loadAssignment = async () => {
+      if (aid && aid !== "new") {
+        setLoading(true);
+        try {
+          const existing = await assignmentClient.findAssignment(aid);
+          setAssignment(existing);
+        } catch (err) {
+          setError("Failed to load assignment details.");
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+    loadAssignment();
+  }, [aid]);
+
+  const validateForm = () => {
+    // Simple validation to ensure title and points are filled
+    if (!assignment.title || !assignment.points) {
+      setIsFormValid(false);
+      setError("Title and points are required.");
+      return false;
     }
-    handleClose();
-    navigate(`/Kanbas/Courses/${cid}/Assignments`);
+    setIsFormValid(true);
+    return true;
   };
 
+  const save = async () => {
+    if (!validateForm()) return;
+
+    setLoading(true);
+    try {
+      if (aid === "new") {
+        await assignmentClient.createAssignmentForCourse(cid!, assignment);
+      } else {
+        await assignmentClient.updateAssignment(assignment);
+      }
+      navigate(`/Kambaz/Courses/${cid}/Assignments`);
+    } catch (err) {
+      setError("Failed to save the assignment.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const u = (key: string) => (e: any) => setAssignment({ ...assignment, [key]: e.target.value });
+
   return (
-    <div id="wd-assignments-editor" className="p-4 border rounded bg-light">
-      <>
-        <label htmlFor="wd-name">Assignment Name</label>
-        <input
-          id="wd-name"
-          className="form-control mb-2"
-          value={assignment.title}
-          onChange={(e) => setAssignment({ ...assignment, title: e.target.value })}
-        />
+    <Container>
+      <div id="wd-assignments-editor">
+        <h3>{aid === "new" ? "Create Assignment" : "Edit Assignment"}</h3>
+        
+        {error && <Alert variant="danger">{error}</Alert>}
+        
+        {loading ? (
+          <Spinner animation="border" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </Spinner>
+        ) : (
+          <>
+            <Form.Label htmlFor="title">Assignment Name</Form.Label>
+            <Form.Control
+              className="mb-2"
+              id="title"
+              value={assignment.title}
+              onChange={u("title")}
+              disabled={loading}
+              isInvalid={!isFormValid && !assignment.title}
+            />
 
-        <textarea
-          className="form-control mb-2"
-          id="wd-description"
-          cols={50}
-          rows={8}
-          value={assignment.description}
-          onChange={(e) => setAssignment({ ...assignment, description: e.target.value })}
-        ></textarea>
+            <Form.Label htmlFor="description">Description</Form.Label>
+            <textarea
+              id="description"
+              className="w-100 mb-2"
+              value={assignment.description}
+              onChange={u("description")}
+              disabled={loading}
+            />
 
-        <label htmlFor="wd-points">Points</label>
-        <input
-          id="wd-points"
-          type="number"
-          className="form-control mb-2"
-          value={assignment.points}
-          onChange={(e) => setAssignment({ ...assignment, points: parseInt(e.target.value) })}
-        />
+            <Row className="mb-2">
+              <Col className="text-end">
+                <Form.Label className="wd-points">Points</Form.Label>
+              </Col>
+              <Col>
+                <Form.Control
+                  id="points"
+                  value={assignment.points}
+                  onChange={u("points")}
+                  disabled={loading}
+                  isInvalid={!isFormValid && !assignment.points}
+                />
+              </Col>
+            </Row>
 
-        <label htmlFor="wd-due-date">Due Date</label>
-        <input
-          type="date"
-          id="wd-due-date"
-          className="form-control mb-2"
-          value={assignment.dueDate}
-          onChange={(e) => setAssignment({ ...assignment, dueDate: e.target.value })}
-        />
+            <div className="border p-3 rounded mb-2">
+              <Row className="mb-2">
+                <Col className="text-end">
+                  <Form.Label htmlFor="due">Due Date</Form.Label>
+                </Col>
+                <Col>
+                  <Form.Control
+                    id="due"
+                    type="date"
+                    value={assignment.due}
+                    onChange={u("due")}
+                    disabled={loading}
+                  />
+                </Col>
+              </Row>
 
-        <label htmlFor="wd-available-from">Available From</label>
-        <input
-          type="date"
-          id="wd-available-from"
-          className="form-control mb-2"
-          value={assignment.availableFrom}
-          onChange={(e) => setAssignment({ ...assignment, availableFrom: e.target.value })}
-        />
+              <Row className="mb-2">
+                <Col className="text-end">
+                  <Form.Label htmlFor="available">Available From</Form.Label>
+                </Col>
+                <Col>
+                  <Form.Control
+                    id="available"
+                    type="date"
+                    value={assignment.available}
+                    onChange={u("available")}
+                    disabled={loading}
+                  />
+                </Col>
+                <Col className="text-end">
+                  <Form.Label htmlFor="availableUntil">Available Until</Form.Label>
+                </Col>
+                <Col>
+                  <Form.Control
+                    id="availableUntil"
+                    type="date"
+                    value={assignment.availableUntil}
+                    onChange={u("availableUntil")}
+                    disabled={loading}
+                  />
+                </Col>
+              </Row>
+            </div>
 
-        <label htmlFor="wd-available-until">Available Until</label>
-        <input
-          type="date"
-          id="wd-available-until"
-          className="form-control mb-2"
-          value={assignment.availableUntil}
-          onChange={(e) => setAssignment({ ...assignment, availableUntil: e.target.value })}
-        />
-
-        <div className="d-flex justify-content-end">
-          <button onClick={handleClose} className="btn btn-secondary me-2">
-            Cancel
-          </button>
-          <button onClick={handleSave} className="btn btn-danger">
-            Save
-          </button>
-        </div>
-      </>
-    </div>
+            <div className="right-aligned-assignment-editor-buttons justify-content-end mt-2">
+              <Button
+                size="lg"
+                className="me-1 float-end"
+                variant="danger"
+                onClick={save}
+                disabled={loading || !isFormValid}
+              >
+                Save
+              </Button>
+              <Button
+                size="lg"
+                className="me-1 float-end"
+                variant="outline-secondary"
+                onClick={() => navigate(`/Kambaz/Courses/${cid}/Assignments`)}
+                disabled={loading}
+              >
+                Cancel
+              </Button>
+            </div>
+          </>
+        )}
+      </div>
+    </Container>
   );
 }
