@@ -1,123 +1,157 @@
-import { useParams, Link } from "react-router-dom";
-import { Form, Button, Container, Row, Col } from "react-bootstrap";
-import assignments from "../../Database/assignments.json"; // Import assignments directly
+import { Form, Container, Row, Col, Button } from "react-bootstrap";
+import { useParams, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { useState } from "react";
 
-export default function AssignmentEditor() {
-  const { cid, aid } = useParams(); // Get course ID and assignment ID from URL
-  const assignment = assignments.find((a) => a._id === aid && a.course === cid); // Find the correct assignment
+export default function AssignmentEditor({
+  assignmentId,
+  updateAssignment,
+  handleClose,
+}: {
+  assignmentId?: string;
+  updateAssignment: (assignment: any) => void;
+  handleClose: () => void;
+}) {
+  const { cid } = useParams();
+  const navigate = useNavigate();
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
+  const isFaculty = currentUser?.role === "FACULTY";
 
-  if (!assignment) {
-    return (
-      <Container fluid className="wd-main-content">
-        <h2>Assignment Not Found</h2>
-      </Container>
-    );
-  }
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [points, setPoints] = useState(100);
+  const [dueDate, setDueDate] = useState("2025-02-21");
+  const [availableFrom, setAvailableFrom] = useState("2025-02-20");
+  const [availableUntil, setAvailableUntil] = useState("2025-03-20");
+
+  const handleCancel = () => {
+    navigate(`/Kambaz/Courses/${cid}/Assignments`);
+    handleClose();
+  };
+
+  const handleSave = () => {
+    updateAssignment({
+      _id: assignmentId,
+      title,
+      description,
+      points,
+      dueDate,
+      availableFrom,
+      availableUntil,
+      course: cid,
+    });
+    navigate(`/Kambaz/Courses/${cid}/Assignments`);
+    handleClose();
+  };
 
   return (
-    <Container fluid className="wd-main-content">
-      <h2 className="mb-4">{assignment.title}</h2> {/* Display assignment title */}
+    <Container id="wd-assignments-editor">
+      <h2>{assignmentId ? "Edit Assignment" : "Create Assignment"}</h2>
 
       <Form>
-        {/* Assignment Title */}
-        <Form.Group controlId="assignmentTitle">
-          <Form.Label>Assignment Title</Form.Label>
-          <Form.Control type="text" defaultValue={assignment.title} />
-        </Form.Group>
-
-        {/* Assignment Instructions */}
-        <Form.Group controlId="assignmentInstructions" className="mt-3">
-          <Form.Text className="text-muted">
-            <p>
-              The assignment is <span className="text-danger">available online</span>.
-            </p>
-            <p>Submit a link to the landing page of your Web application running on <a href="#">Netlify</a>.</p>
-            <p>The landing page should include:</p>
-            <ul>
-              <li>Your full name and section</li>
-              <li>Links to each of the lab assignments</li>
-              <li>Link to the Kanbas application</li>
-              <li>Links to all relevant source code repositories</li>
-            </ul>
-          </Form.Text>
-        </Form.Group>
-
-        {/* Points */}
-        <Row className="mt-4">
-          <Col md={6}>
-            <Form.Group controlId="points">
-              <Form.Label>Points</Form.Label>
-              <Form.Control type="number" placeholder="100" />
-            </Form.Group>
+        <Row className="align-items-center">
+          <Col xs={3}>
+            <Form.Label>Assignment Name</Form.Label>
           </Col>
-
-          <Col md={6}>
-            <Form.Group controlId="assignmentGroup">
-              <Form.Label>Assignment Group</Form.Label>
-              <Form.Select>
-                <option>ASSIGNMENTS</option>
-              </Form.Select>
-            </Form.Group>
+          <Col>
+            <Form.Control
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              disabled={!isFaculty}
+            />
           </Col>
         </Row>
 
-        {/* Display Grade */}
-        <Form.Group controlId="displayGrade" className="mt-3">
-          <Form.Label>Display Grade as</Form.Label>
-          <Form.Select>
-            <option>Percentage</option>
-          </Form.Select>
-        </Form.Group>
-
-        {/* Submission Type */}
-        <Form.Group controlId="submissionType" className="mt-4">
-          <Form.Label>Submission Type</Form.Label>
-          <Form.Select>
-            <option>Online</option>
-          </Form.Select>
-        </Form.Group>
-
-        {/* Online Entry Options */}
-        <Form.Group controlId="onlineOptions" className="mt-3">
-          <Form.Label>Online Entry Options</Form.Label>
-          <Form.Check type="checkbox" label="Text Entry" />
-          <Form.Check type="checkbox" label="Website URL" defaultChecked />
-          <Form.Check type="checkbox" label="Media Recordings" />
-          <Form.Check type="checkbox" label="Student Annotation" />
-          <Form.Check type="checkbox" label="File Uploads" />
-        </Form.Group>
-
-        {/* Assign To */}
-        <Form.Group controlId="assignTo" className="mt-4">
-          <Form.Label>Assign To</Form.Label>
-          <Form.Control type="text" value="Everyone" readOnly />
-        </Form.Group>
-
-        {/* Due Date & Availability */}
-        <Row className="mt-3">
-          <Col md={6}>
-            <Form.Group controlId="dueDate">
-              <Form.Label>Due</Form.Label>
-              <Form.Control type="date" />
-            </Form.Group>
+        <Row className="align-items-center mt-2">
+          <Col xs={3}>
+            <Form.Label>Description</Form.Label>
           </Col>
-
-          <Col md={6}>
-            <Form.Group controlId="availableFrom">
-              <Form.Label>Available From</Form.Label>
-              <Form.Control type="date" />
-            </Form.Group>
+          <Col>
+            <Form.Control
+              as="textarea"
+              rows={4}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              disabled={!isFaculty}
+            />
           </Col>
         </Row>
 
-        {/* Save and Cancel Buttons */}
-        <div className="mt-4 d-flex justify-content-between">
-          <Link to={`/Kambaz/Courses/${cid}/Assignments`}>
-            <Button variant="secondary">Cancel</Button>
-          </Link>
-          <Button variant="danger">Save</Button>
-        </div>
+        <Row className="align-items-center mt-2">
+          <Col xs={3}>
+            <Form.Label>Points</Form.Label>
+          </Col>
+          <Col>
+            <Form.Control
+              type="number"
+              value={points}
+              onChange={(e) => setPoints(Number(e.target.value))}
+              disabled={!isFaculty}
+            />
+          </Col>
+        </Row>
+
+        <Row className="align-items-center mt-2">
+          <Col xs={3}>
+            <Form.Label>Due Date</Form.Label>
+          </Col>
+          <Col>
+            <Form.Control
+              type="date"
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+              disabled={!isFaculty}
+            />
+          </Col>
+        </Row>
+
+        <Row className="align-items-center mt-2">
+          <Col xs={6}>
+            <Form.Label>Available from</Form.Label>
+          </Col>
+          <Col xs={6}>
+            <Form.Label>Until</Form.Label>
+          </Col>
+        </Row>
+
+        <Row className="align-items-center">
+          <Col xs={6}>
+            <Form.Control
+              type="date"
+              value={availableFrom}
+              onChange={(e) => setAvailableFrom(e.target.value)}
+              disabled={!isFaculty}
+            />
+          </Col>
+          <Col xs={6}>
+            <Form.Control
+              type="date"
+              value={availableUntil}
+              onChange={(e) => setAvailableUntil(e.target.value)}
+              disabled={!isFaculty}
+            />
+          </Col>
+        </Row>
+
+        {isFaculty ? (
+          <div className="mt-3">
+            <Button onClick={handleSave} className="btn btn-primary me-2">
+              Save
+            </Button>
+            <Button onClick={handleCancel} className="btn btn-secondary">
+              Cancel
+            </Button>
+          </div>
+        ) : (
+          <div className="mt-3">
+            <Button onClick={handleCancel} className="btn btn-secondary">
+              Back
+            </Button>
+          </div>
+        )}
       </Form>
     </Container>
   );
 }
+
