@@ -1,123 +1,67 @@
-// src/Kambaz/Courses/Assignments/index.tsx
+import { ListGroup } from "react-bootstrap";
+import { useState } from "react";
+import { BsGripVertical } from "react-icons/bs";
+import AssignmentControls from "./AssignmentControls";
+import ModuleControlButtons from "../Modules/ModuleControlButtons";
+import LessonControlButtons from "../Modules/LessonControlButtons";
+import { MdDescription } from "react-icons/md";
+import { Link } from "react-router-dom";
+import "../../styles.css";
+import { useParams } from "react-router";
 import { useSelector, useDispatch } from "react-redux";
-import { useParams } from "react-router-dom";
-import { Container, Row, Col, Form, Button, ListGroup } from "react-bootstrap";
-import { FaPlus, FaTrash, FaPen, FaCheckCircle } from "react-icons/fa";
-import {
-  deleteAssignment,
-  openAssignmentCreator,
-  closeAssignmentCreator,
-  openAssignmentEditor,
-  closeAssignmentEditor,
-  setAssignmentSearchTerm,
-} from "./reducer";
-import Creator from "./CreateAss";
-import AssignmentEditor from "./Editor";
+import assignments from "../../Database/assignments.json";
+import { deleteAssignment, updateAssignment } from "./reducer";
 
 export default function Assignments() {
   const { cid } = useParams();
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
+  const filteredAssignments = assignments.filter((assignment: any) => assignment.course === cid);
+  const isFaculty = currentUser?.role === "FACULTY";
   const dispatch = useDispatch();
-
-  // Now we reference state.assignments.ui and state.assignments.assignments
-  const showCreator = useSelector((state: any) => state.assignments.ui.showAssignmentCreator);
-  const showEditor = useSelector((state: any) => state.assignments.ui.showAssignmentEditor);
-  const searchTerm = useSelector((state: any) => state.assignments.ui.assignmentSearchTerm);
-
-  // The actual array of assignments
-  const assignments = useSelector((state: any) => state.assignments.assignments.assignments);
-
-  const courseAssignments = assignments.filter((a: any) => a.course === cid);
-  const filtered = courseAssignments.filter((a: any) =>
-    (a.name || "").toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const handleDelete = (assignmentId: string) => {
-    if (window.confirm("Are you sure you want to delete this assignment?")) {
-      dispatch(deleteAssignment(assignmentId));
-    }
-  };
-
-  const handleGroup = () => {
-    alert("Group functionality not yet implemented!");
-  };
+  const [editingAssignmentId] = useState<string | null>(null);
 
   return (
-    <Container fluid className="wd-main-content">
-      <Creator
-        show={showCreator}
-        handleClose={() => dispatch(closeAssignmentCreator())}
-        cid={cid}
-      />
-      <AssignmentEditor
-        show={showEditor}
-        handleClose={() => dispatch(closeAssignmentEditor())}
-      />
-
-      <Row className="mb-3 align-items-center">
-        <Col xs={12} md={6}>
-          <h2 className="mb-0">Assignments</h2>
-        </Col>
-        <Col xs={12} md={6} className="text-md-end mt-3 mt-md-0">
-          <Form className="d-inline-block me-2">
-            <Form.Control
-              type="text"
-              placeholder="Search for Assignment"
-              value={searchTerm}
-              onChange={(e) => dispatch(setAssignmentSearchTerm(e.target.value))}
-              style={{ width: "200px" }}
-            />
-          </Form>
-          <Button variant="danger" className="me-2" onClick={handleGroup}>
-            <FaPlus className="me-2" />
-            Group
-          </Button>
-          <Button variant="danger" onClick={() => dispatch(openAssignmentCreator())}>
-            <FaPlus className="me-2" />
-            Assignment
-          </Button>
-        </Col>
-      </Row>
-
-      {filtered.length === 0 ? (
-        <p>No assignments found for this course.</p>
-      ) : (
-        <ListGroup>
-          {filtered.map((assignment: any) => (
-            <ListGroup.Item
-              key={assignment._id}
-              className="d-flex justify-content-between align-items-center"
-            >
-              <div>
-                <div className="d-flex align-items-center">
-                  <span className="fw-bold">{assignment.name}</span>
-                  <Button
-                    variant="outline-secondary"
-                    size="sm"
-                    className="ms-2"
-                    onClick={() => dispatch(openAssignmentEditor(assignment))}
-                  >
-                    <FaPen />
-                  </Button>
-                </div>
-                <br />
-                <small className="text-muted">
-                  {assignment.dueDate ? `Due ${assignment.dueDate}` : "No Due Date"}
-                </small>
-              </div>
-              <div className="d-flex align-items-center">
-                <FaCheckCircle className="text-success me-3" />
-                <Button
-                  variant="outline-danger"
-                  size="sm"
-                  onClick={() => handleDelete(assignment._id)}
-                >
-                  <FaTrash />
-                </Button>
-              </div>
-            </ListGroup.Item>
-          ))}
-        </ListGroup>
+    <div id="wd-assignments">
+      {isFaculty && (
+        <AssignmentControls 
+          assignmentId={editingAssignmentId || undefined}
+          updateAssignment={(updatedAssignment) => dispatch(updateAssignment(updatedAssignment))}
+        />
       )}
-    </Container>
+      <br /><br /><br /><br />
+
+      <ListGroup className="rounded-0" id="wd-assignments-list">
+        {filteredAssignments.map((assignment: any) => (
+          <li key={assignment._id} className="wd-module list-group-item p-0 mb-5 fs-5 border-gray">
+            <div className="wd-title p-3 ps-2 bg-secondary text-black">
+              <BsGripVertical className="me-2 fs-3" /> {assignment.title}
+              {isFaculty && (
+                <ModuleControlButtons 
+                  moduleId={assignment._id}
+                  deleteModule={() => dispatch(deleteAssignment(assignment._id))}
+                  editModule={() => updateAssignment(assignment._id)} 
+                />
+              )}
+            </div>
+            
+            <ul className="wd-lessons list-group rounded-0">
+              <li className="wd-lesson list-group-item p-3 d-flex align-items-start">
+                <BsGripVertical className="me-2 fs-3 text-gray" />
+                <MdDescription className="me-2 text-success fs-4" />
+                <div className="flex-grow-1">
+                  <Link to={`./${assignment._id}`} className="fw-semibold text-dark mb-1 text-decoration-none">
+                    {assignment.title}
+                  </Link>
+                  <p className="text-sm mb-1">
+                    <span className="text-danger">{assignment.course}</span>
+                  </p>
+                </div>
+                <LessonControlButtons />
+              </li>
+            </ul>
+          </li>
+        ))}
+      </ListGroup>
+    </div>
   );
 }
