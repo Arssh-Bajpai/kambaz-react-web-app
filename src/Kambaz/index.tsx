@@ -1,65 +1,49 @@
-import KambazNavigation from "./Navigation";
-import { Routes, Route, Navigate } from "react-router-dom";
-import Dashboard from "./Dashboard";
-import Courses from "./Courses";
-import * as db from "./Database";
+import CourseNavigation from "./Navigation";
+import { Route, Routes, useParams, useLocation } from "react-router";
+import Home from "./Home";
+import Modules from "./Modules";
+import Assignments from "./Assignments";
+import AssignmentEditor from "./Assignments/Editor";
+import PeopleTable from "./People/Table";
+import { FaAlignJustify } from "react-icons/fa";
 import { useState } from "react";
-import { v4 as uuidv4 } from "uuid";
-import ProtectedRoute from "./Account/ProtectedRoute";
-import Account from "./Account";
 
-// Define Course Type for Consistency
-type Course = {
-  _id: string;
-  name: string;
-  number: string;
-  startDate: string;
-  endDate: string;
-  description: string;
-};
+export default function Courses({ courses }: { courses: any[] }) {
+  const { cid } = useParams();
+  const course = courses.find((course) => course._id === cid);
 
-export default function Kambaz() {
-  // ✅ Ensure courses are initialized properly
-  const [courses, setCourses] = useState<Course[]>(db.courses || []);
-
-  // ✅ Define state for a new course
-  const [course, setCourse] = useState<Course>({
-    _id: "1234",
-    name: "New Course",
-    number: "New Number",
-    startDate: "2023-09-10",
-    endDate: "2023-12-15",
-    description: "New Description",
-  });
-
-  // ✅ Function to add a new course
-  const addNewCourse = () => {
-    setCourses([...courses, { ...course, _id: uuidv4() }]);
-  };
-
-  // ✅ Function to delete a course
-  const deleteCourse = (courseId: string) => {
-    setCourses(courses.filter((course) => course._id !== courseId));
-  };
-
-  // ✅ Function to update an existing course
-  const updateCourse = () => {
-    setCourses(courses.map((c) => (c._id === course._id ? course : c)));
-  };
+  const { pathname } = useLocation();
 
   return (
-    <div id="wd-kambaz">
-      <KambazNavigation />
-      <div className="wd-main-content-offset p-3">
-      <Routes>
-  <Route path="/" element={<Navigate to="Dashboard" />} />
-  <Route path="Account/*"      element={<Account />} />
-  <Route path="Dashboard"      element={<ProtectedRoute><Dashboard            /></ProtectedRoute> } />
-  <Route path="Courses/:cid/*" element={<ProtectedRoute><Courses courses={courses} /></ProtectedRoute> } />
-  <Route path="Calendar"       element={<h1>Calendar</h1>} />
-  <Route path="Inbox"          element={<h1>Inbox</h1>} />
-</Routes>
-
+    <div id="wd-courses">
+      <h2 className="text-danger">
+        <FaAlignJustify className="me-4 fs-4 mb-1" />
+        {course && course.name} &gt; {pathname.split("/")[4]}
+      </h2>
+      <hr />
+      <div className="d-flex">
+        <div className="d-none d-md-block">
+          <CourseNavigation />
+        </div>
+        <div className="flex-fill" style={{ paddingTop: "10px" }}>
+          <Routes>
+            <Route path="Home" element={<Home />} />
+            <Route path="Modules" element={<Modules />} />
+            <Route path="Assignments" element={<Assignments />} />
+            <Route
+              path="Assignments/:aid"
+              element={
+                <AssignmentEditor
+                  handleClose={() => {}}
+                  updateAssignment={(assignment) =>
+                    console.log("Assignment saved:", assignment)
+                  }
+                />
+              }
+            />
+            <Route path="People" element={<PeopleTable />} />
+          </Routes>
+        </div>
       </div>
     </div>
   );
