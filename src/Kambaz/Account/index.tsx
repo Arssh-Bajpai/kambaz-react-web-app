@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from "react-router";
 import Signin from "./Signin";
 import Signup from "./Signup";
 import Profile from "./Profile";
+import Users from "./Users";
 import AccountNavigation from "./Navigation";
 
 export default function Account() {
@@ -25,6 +26,7 @@ export default function Account() {
                 <Route path="/Signin" element={<Signin />} />
                 <Route path="/Signup" element={<Signup />} />
                 <Route path="/Profile" element={<Profile />} />
+                <Route path="/Users" element={<Users />} />
               </Routes>
             </td>
           </tr>

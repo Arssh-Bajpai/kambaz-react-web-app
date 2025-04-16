@@ -5,26 +5,42 @@ export default function AccountNavigation() {
   const { currentUser } = useSelector((state: any) => state.accountReducer);
   const { pathname } = useLocation();
 
-  const links = currentUser
-    ? [{ name: "Profile", path: "/Kambaz/Account/Profile" }]
-    : [
-        { name: "Signin", path: "/Kambaz/Account/Signin" },
-        { name: "Signup", path: "/Kambaz/Account/Signup" },
-      ];
+  const active = (path: string) => (pathname.includes(path) ? "active" : "");
 
   return (
-    <nav className="list-group">
-      {links.map((link) => (
+    <div id="wd-account-navigation" className="list-group">
+      {currentUser ? (
         <Link
-          key={link.name}
-          to={link.path}
-          className={`list-group-item list-group-item-action ${
-            pathname === link.path ? "active" : ""
-          }`}
+          to="/Kambaz/Account/Profile"
+          className={`list-group-item ${active("Profile")}`}
         >
-          {link.name}
+          Profile
         </Link>
-      ))}
-    </nav>
+      ) : (
+        <>
+          <Link
+            to="/Kambaz/Account/Signin"
+            className={`list-group-item ${active("Signin")}`}
+          >
+            Signin
+          </Link>
+          <Link
+            to="/Kambaz/Account/Signup"
+            className={`list-group-item ${active("Signup")}`}
+          >
+            Signup
+          </Link>
+        </>
+      )}
+
+      {currentUser && currentUser.role === "ADMIN" && (
+        <Link
+          to="/Kambaz/Account/Users"
+          className={`list-group-item ${active("Users")}`}
+        >
+          Users
+        </Link>
+      )}
+    </div>
   );
 }
