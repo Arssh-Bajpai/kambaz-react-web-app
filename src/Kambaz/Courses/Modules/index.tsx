@@ -9,6 +9,7 @@ import { setModules, addModule, editModule, updateModule, deleteModule } from ".
 import * as coursesClient from "../client";
 import { useSelector, useDispatch } from "react-redux";
 import * as modulesClient from "./client";
+import * as courseClient from "../client";
 
 export default function Modules() {
   const { cid } = useParams();
@@ -28,6 +29,23 @@ export default function Modules() {
     init();
   }, [cid, dispatch]);
 
+  const fetchModulesForCourse = async () => {
+    const modules = await courseClient.findModulesForCourse(cid!);
+    dispatch(setModules(modules));
+  };
+  useEffect(() => {
+    fetchModulesForCourse();
+  }, [cid]);
+
+  const addModuleHandler = async () => {
+    const newModule = await courseClient.createModuleForCourse(cid!, {
+      name: moduleName,
+      course: cid,
+    });
+    dispatch(addModule(newModule));
+    setModuleName("");
+  };
+ 
   const createModule = async () => {
     if (!cid || !moduleName.trim()) return;
     const newModule = { name: moduleName, course: cid };
@@ -107,7 +125,7 @@ export default function Modules() {
         <ModulesControls
           setModuleName={setModuleName}
           moduleName={moduleName}
-          addModule={createModule}
+          addModule={addModuleHandler}
         />
       )}
       <ListGroup id="wd-modules" className="rounded-0 w-100">

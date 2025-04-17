@@ -26,7 +26,7 @@ export default function Kambaz() {
 
   const fetchCourses = async () => {
     try {
-      const courses = await userClient.findMyCourses();
+      const courses = await courseClient.fetchAllCourses();
       setCourses(courses);
     } catch (error) {
       console.error(error);
@@ -41,13 +41,16 @@ export default function Kambaz() {
   }, [currentUser]);
 
   const addNewCourse = async () => {
-    const newCourse = await userClient.createCourse(course);
+    const newCourse = await courseClient.createCourse(course);
     setCourses([...courses, newCourse]);
+ 
   };
 
   const deleteCourse = async (courseId: string) => {
+    const status = await courseClient.deleteCourse(courseId);
     setCourses(courses.filter((course) => course._id !== courseId));
   };
+ 
 
   const updateCourse = async () => {
     await courseClient.updateCourse(course);
