@@ -1,108 +1,176 @@
-import "./styles.css";
-import { Routes, Route, Navigate } from "react-router";
-import Dashboard from "./Dashboard";
+// src/Kambaz/index.tsx
+import { useState, useEffect } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import axios from "axios";
+
 import KambazNavigation from "./Navigation";
-import Courses from "./Courses";
-import Account from "./Account";
-import { useEffect, useState } from "react";
-import ProtectedRoute from "./Account/ProtectedRoute";
 import Session from "./Account/Session";
+import Account from "./Account";
+import Dashboard from "./Dashboard";
+import Courses from "./Courses";
+import AssignmentEditor from "./Courses/Assignments/Editor";
+import ProtectedRoute from "./Account/ProtectedRoute";
 import * as userClient from "./Account/client";
-import { useSelector } from "react-redux";
 import * as courseClient from "./Courses/client";
+import * as enrollmentsClient from "./Enrollments/client";
+import { setEnrollments } from "./Courses/People/reducer";
+
+axios.defaults.withCredentials = true;
 
 export default function Kambaz() {
   const [courses, setCourses] = useState<any[]>([]);
-  const [course, setCourse] = useState<any>({
-    _id: "1234",
-    name: "New Course",
-    number: "New Number",
-    startDate: "2023-09-10",
-    endDate: "2023-12-15",
-    description: "New Description",
-  });
+  const [course, setCourse] = useState<any | null>(null);
+  const [enrolling, setEnrolling] = useState<boolean>(false);
 
   const { currentUser } = useSelector((state: any) => state.accountReducer);
+  const dispatch = useDispatch();
 
-  const fetchCourses = async () => {
+  const findCoursesForUser = async () => {
     try {
-      const courses = await courseClient.fetchAllCourses();
+      const courses = await userClient.findCoursesForUser(currentUser._id);
       setCourses(courses);
     } catch (error) {
       console.error(error);
     }
   };
 
-  // ✅ Only fetch courses if user is loaded
-  useEffect(() => {
-    if (currentUser) {
-      fetchCourses();
+  const fetchCourses = async () => {
+    try {
+      const allCourses = await courseClient.fetchAllCourses();
+      const enrolledCourses = await userClient.findCoursesForUser(currentUser._id);
+      const courses = allCourses.map((course: any) => {
+        const isEnrolled = enrolledCourses.find((c: any) => c._id === course._id);
+        return { ...course, enrolled: !!isEnrolled };
+      });
+      setCourses(courses);
+    } catch (error) {
+      console.error(error);
     }
-  }, [currentUser]);
+  };
 
-  const addNewCourse = async () => {
-    const newCourse = await courseClient.createCourse(course);
-    setCourses([...courses, newCourse]);
- 
+  const updateEnrollment = async (courseId: string, enrolled: boolean) => {
+    try {
+      if (enrolled) {
+        await userClient.enrollIntoCourse(currentUser._id, courseId);
+      } else {
+        await userClient.unenrollFromCourse(currentUser._id, courseId);
+      }
+
+      setCourses(
+        courses.map((course) =>
+          course._id === courseId ? { ...course, enrolled: enrolled } : course
+        )
+      );
+
+      const userCourses = await enrollmentsClient.findCoursesForUser(currentUser._id);
+      const formatted = userCourses.map((c: any) => ({
+        user: currentUser._id,
+        course: c._id,
+      }));
+      dispatch(setEnrollments(formatted));
+    } catch (error) {
+      console.error("Error updating enrollment:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (!currentUser?._id) return;
+    if (enrolling) {
+      fetchCourses();
+    } else {
+      findCoursesForUser();
+    }
+  }, [currentUser, enrolling]);
+
+  const addNewCourse = async (newCourse: any) => {
+    try {
+      const savedCourse = await courseClient.createCourse(newCourse);
+      setCourses([...courses, savedCourse]);
+    } catch (error) {
+      console.error("Error adding course:", error);
+    }
   };
 
   const deleteCourse = async (courseId: string) => {
-    const status = await courseClient.deleteCourse(courseId);
-    setCourses(courses.filter((course) => course._id !== courseId));
+    try {
+      const status = await courseClient.deleteCourse(courseId);
+      setCourses(courses.filter((course) => course._id !== courseId));
+      return status;
+    } catch (error) {
+      console.error("Error deleting course:", error);
+    }
   };
- 
 
-  const updateCourse = async () => {
-    await courseClient.updateCourse(course);
-    setCourses(
-      courses.map((c) => (c._id === course._id ? course : c))
-    );
+  const updateCourse = async (updatedCourse: any) => {
+    if (!updatedCourse || !updatedCourse._id) {
+      console.warn("No course selected to update.");
+      return;
+    }
+
+    try {
+      const updated = await courseClient.updateCourse(updatedCourse);
+      setCourses(
+        courses.map((c) => (c._id === updated._id ? updated : c))
+      );
+    } catch (error) {
+      console.error("Error updating course:", error);
+    }
   };
 
   return (
-    <Session>
-      <div id="wd-kambaz">
-        <table width="100%">
-          <tbody>
-            <tr>
-              <td valign="top">
-                <KambazNavigation />
-              </td>
-              <td valign="top">
-                <div className="wd-main-content-offset p-3">
-                  <Routes>
-                    <Route path="/" element={<Navigate to="Dashboard" />} />
-                    <Route path="/Account/*" element={<Account />} />
-                    <Route
-                      path="Dashboard"
-                      element={
-                        <ProtectedRoute>
-                          <Dashboard
-                            courses={courses}
-                            course={course}
-                            setCourse={setCourse}
-                            addNewCourse={addNewCourse}
-                            deleteCourse={deleteCourse}
-                            updateCourse={updateCourse}
-                          />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="Courses/:cid/*"
-                      element={
-                        <ProtectedRoute>
-                          <Courses courses={courses} />
-                        </ProtectedRoute>
-                      }
-                    />
-                  </Routes>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </Session>
+    <div id="wd-kambaz" className="d-flex">
+      <Session>
+        <div className="row">
+          <div className="d-none d-md-block flex-column">
+            <KambazNavigation />
+          </div>
+          <div className="col flex-grow">
+            <div className="wd-main-content-offset p-3">
+              <Routes>
+                <Route path="/" element={<Navigate to="Account" />} />
+                <Route path="/Account/*" element={<Account />} />
+                <Route
+                  path="Dashboard"
+                  element={
+                    <ProtectedRoute>
+                      <Dashboard
+                        courses={courses}
+                        course={course}
+                        setCourse={setCourse}
+                        addNewCourse={addNewCourse}
+                        deleteCourse={deleteCourse}
+                        updateCourse={updateCourse}
+                        enrolling={enrolling}
+                        setEnrolling={setEnrolling}
+                        updateEnrollment={updateEnrollment} // ✅ added here
+                      />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="Courses/:cid/Assignments/new"
+                  element={
+                    <ProtectedRoute>
+                      <AssignmentEditor />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="Courses/:cid/*"
+                  element={
+                    <ProtectedRoute>
+                      <Courses courses={courses} />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="/Calendar" element={<h1>Calendar</h1>} />
+                <Route path="/Inbox" element={<h1>Inbox</h1>} />
+              </Routes>
+            </div>
+          </div>
+        </div>
+      </Session>
+    </div>
   );
 }

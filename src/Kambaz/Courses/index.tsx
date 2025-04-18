@@ -1,15 +1,29 @@
 import CourseNavigation from "./Navigation";
 import Modules from "./Modules";
 import Home from "./Home/index.tsx";
-import { Navigate, Route, Routes, useParams, useLocation} from "react-router";
+import { Navigate, Route, Routes, useParams, useLocation } from "react-router";
 import Assignments from "./Assignments";
 import AssignmentEditor from "./Assignments/Editor";
 import { FaAlignJustify } from "react-icons/fa"
 import PeopleTable from "./People/Table"
+import * as client from "../Enrollments/client";
+import { useEffect, useState } from "react";
+
 export default function Courses({ courses }: { courses: any[]; }) {
   const { cid } = useParams();
   const course = courses.find((course) => course._id === cid);
   const { pathname } = useLocation();
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    const loadUsers = async () => {
+      if (cid && pathname.endsWith("People")) {
+        const data = await client.findUsersForCourse(cid);
+        setUsers(data);
+      }
+    };
+    loadUsers();
+  }, [cid, pathname]);
 
   return (
     <div className="d-flex flex-column">
@@ -32,8 +46,7 @@ export default function Courses({ courses }: { courses: any[]; }) {
           <Route path="Modules" element={<Modules />} />
           <Route path="Assignments" element={<Assignments />} />
           <Route path="Assignments/:aid" element={<AssignmentEditor />} />
-          <Route path="People" element={<PeopleTable />} />
-
+          <Route path="People" element={<PeopleTable users={users} />} />
         </Routes>
 
       </div>

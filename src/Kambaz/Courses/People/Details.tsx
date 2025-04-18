@@ -25,7 +25,8 @@ export default function PeopleDetails() {
     navigate(-1);
   };
 
-  const saveUser = async () => {
+
+ const saveUser = async () => {
     const [firstName, lastName] = name.split(" ");
     const updatedUser = { ...user, firstName, lastName };
     await client.updateUser(updatedUser);
@@ -33,6 +34,7 @@ export default function PeopleDetails() {
     setEditing(false);
     navigate(-1);
   };
+
 
   useEffect(() => {
     if (uid) fetchUser();

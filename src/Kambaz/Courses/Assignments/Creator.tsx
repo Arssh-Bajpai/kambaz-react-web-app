@@ -3,7 +3,7 @@ import { Button, Container, Form, Row, Col } from "react-bootstrap";
 import { useParams, useNavigate } from "react-router-dom";
 import * as assignmentClient from "./client";
 
-export default function AssignmentEditor() {
+export default function AssignmentCreator() {
   const { aid, cid } = useParams();
   const navigate = useNavigate();
 
@@ -31,10 +31,17 @@ export default function AssignmentEditor() {
   }, [aid]);
 
   const save = async () => {
+    // Associate assignment only with the module
+    const assignmentToSave = {
+      ...assignment,
+      course: undefined, // Remove course association if backend allows
+      module: assignment.module,
+    };
+
     if (isCreateMode) {
-      await assignmentClient.createAssignmentForCourse(cid!, assignment);
+      await assignmentClient.createAssignmentForCourse(cid!, assignmentToSave);
     } else {
-      await assignmentClient.updateAssignment(assignment);
+      await assignmentClient.updateAssignment({ ...assignment, module: assignment.module });
     }
     navigate(`/Kambaz/Courses/${cid}/Assignments`);
   };

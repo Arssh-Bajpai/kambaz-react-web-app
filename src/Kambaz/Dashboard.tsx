@@ -1,7 +1,10 @@
-import { Card, Row, Col, Button, Form, FormControl } from "react-bootstrap";
-import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { Card, FormControl, Button } from "react-bootstrap";
+import { setEnrollments } from "./Courses/People/reducer";
+import * as enrollmentsClient from "./Enrollments/client";
+import EnrollmentButtonUpdated from "./Enrollments/EnrollmentButton";
 
 export default function Dashboard({
   courses,
@@ -10,181 +13,246 @@ export default function Dashboard({
   addNewCourse,
   deleteCourse,
   updateCourse,
+  enrolling,
+  setEnrolling,
+  updateEnrollment, // ✅ Added prop
 }: {
   courses: any[];
   course: any;
-  setCourse: (course: any) => void;
-  addNewCourse: () => void;
-  deleteCourse: (course: any) => void;
-  updateCourse: () => void;
+  setCourse: React.Dispatch<any>;
+  addNewCourse: (course: any) => void;
+  deleteCourse: (courseId: any) => void;
+  updateCourse: (course: any) => void;
+  enrolling: boolean;
+  setEnrolling: (enrolling: boolean) => void;
+  updateEnrollment: (courseId: string, enrolled: boolean) => void; // ✅ Added type
 }) {
-  const { currentUser } = useSelector((state: any) => state.accountReducer);
-  const isFaculty = currentUser?.role === "FACULTY";
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const [courseName, setCourseName] = useState("");
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
+  const { enrollments = [] } = useSelector((state: any) => state.enrollmentsReducer);
+
+  const isFaculty = currentUser?.role === "Faculty";
+  const isStudent = currentUser?.role === "Student";
+
+  const [editingCourse, setEditingCourse] = useState<any | null>(null);
+  const [newCourse, setNewCourse] = useState({
+    name: "",
+    number: "",
+    startDate: "",
+    endDate: "",
+    credits: 3,
+    image: "/default.jpg",
+    description: "",
+  });
+
+  const isEnrolled = (courseId: string) =>
+    enrollments.some(
+      (enroll: any) => enroll.user === currentUser._id && enroll.course === courseId
+    );
+
+  const displayedCourses = enrolling
+    ? courses
+    : courses.filter((c: any) => isEnrolled(c._id));
+
+  const handleCreateCourse = async () => {
+    await addNewCourse(newCourse);
+    setNewCourse({
+      name: "",
+      number: "",
+      startDate: "",
+      endDate: "",
+      credits: 3,
+      image: "/default.jpg",
+      description: "",
+    });
+  };
+
+  useEffect(() => {
+    const loadEnrollments = async () => {
+      if (currentUser?.role === "Student") {
+        const userCourses = await enrollmentsClient.findCoursesForUser(currentUser._id);
+        const formatted = userCourses.map((c: any) => ({
+          user: currentUser._id,
+          course: c._id,
+        }));
+        dispatch(setEnrollments(formatted));
+      }
+    };
+    loadEnrollments();
+  }, [currentUser]);
 
   return (
-    <div id="wd-dashboard" className="dashboard-container">
-      <h1 className="dashboard-title">Dashboard</h1>
+    <div className="p-4" id="wd-dashboard">
+      <h1 id="wd-dashboard-title">
+        Dashboard
+        {isStudent && (
+          <Button
+            className="float-end"
+            onClick={() => setEnrolling(!enrolling)}
+          >
+            {enrolling ? "My Courses" : "All Courses"}
+          </Button>
+        )}
+      </h1>
       <hr />
 
-      {/* Conditional Rendering for Faculty */}
       {isFaculty && (
-        <FacultySection
-          course={course}
-          courseName={courseName}
-          setCourseName={setCourseName}
-          setCourse={setCourse}
-          addNewCourse={addNewCourse}
-          updateCourse={updateCourse}
-        />
+        <div className="mb-4 border rounded p-3 bg-light">
+          <h4>Add New Course</h4>
+          <FormControl
+            className="mb-2"
+            placeholder="Course Name"
+            value={newCourse.name}
+            onChange={(e) => setNewCourse({ ...newCourse, name: e.target.value })}
+          />
+          <FormControl
+            className="mb-2"
+            placeholder="Course Number"
+            value={newCourse.number}
+            onChange={(e) => setNewCourse({ ...newCourse, number: e.target.value })}
+          />
+          <FormControl
+            className="mb-2"
+            placeholder="Start Date (YYYY-MM-DD)"
+            value={newCourse.startDate}
+            onChange={(e) => setNewCourse({ ...newCourse, startDate: e.target.value })}
+          />
+          <FormControl
+            className="mb-2"
+            placeholder="End Date (YYYY-MM-DD)"
+            value={newCourse.endDate}
+            onChange={(e) => setNewCourse({ ...newCourse, endDate: e.target.value })}
+          />
+          <FormControl
+            className="mb-2"
+            placeholder="Description"
+            value={newCourse.description}
+            onChange={(e) => setNewCourse({ ...newCourse, description: e.target.value })}
+          />
+          <Button variant="primary" onClick={handleCreateCourse}>
+            + Add Course
+          </Button>
+        </div>
       )}
 
-      {/* Published Courses Section */}
-      <PublishedCourses courses={courses} deleteCourse={deleteCourse} setCourse={setCourse} />
+      <div className="row row-cols-1 row-cols-md-4 g-4">
+        {displayedCourses.map((c: any) => (
+          <div key={c._id} className="col" style={{ width: "300px" }}>
+            <div className="card">
+              <Card.Img
+                src={c.image}
+                variant="top"
+                width="100%"
+                height={160}
+                onClick={() => navigate(`/Kambaz/Courses/${c._id}/Home`)}
+              />
+              <Card.Body className="card-body">
+                <Card.Title
+                  className="wd-dashboard-course-title text-nowrap overflow-hidden"
+                  onClick={() => navigate(`/Kambaz/Courses/${c._id}/Home`)}
+                >
+                  {enrolling && isStudent && (
+                    <Button
+                      onClick={(event) => {
+                        event.preventDefault();
+                        updateEnrollment(c._id, !isEnrolled(c._id)); // ✅ use prop here
+                      }}
+                      className={`btn-sm float-end ${
+                        isEnrolled(c._id) ? "btn-danger" : "btn-success"
+                      }`}
+                    >
+                      {isEnrolled(c._id) ? "Unenroll" : "Enroll"}
+                    </Button>
+                  )}
+                  {c.name}
+                </Card.Title>
+                <Card.Text
+                  className="wd-dashboard-course-description overflow-hidden"
+                  style={{ height: "100px" }}
+                >
+                  {c.description}
+                </Card.Text>
+
+                {isStudent && !enrolling && (
+                  <EnrollmentButtonUpdated
+                    courseId={c._id}
+                    isEnrolled={isEnrolled(c._id)}
+                    currentUser={currentUser}
+                  />
+                )}
+
+                {isFaculty && (
+                  <>
+                    <Button
+                      variant="danger"
+                      className="float-end"
+                      onClick={(event) => {
+                        event.preventDefault();
+                        deleteCourse(c._id);
+                      }}
+                    >
+                      Delete
+                    </Button>
+                    <Button
+                      variant="warning"
+                      className="me-2 float-end"
+                      onClick={(event) => {
+                        event.preventDefault();
+                        setEditingCourse(c);
+                      }}
+                    >
+                      Edit
+                    </Button>
+                  </>
+                )}
+              </Card.Body>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {editingCourse && (
+        <div className="mt-4 border rounded p-4 bg-light">
+          <h4>Edit Course</h4>
+          <FormControl
+            className="mb-2"
+            placeholder="Course Name"
+            value={editingCourse.name}
+            onChange={(e) =>
+              setEditingCourse({ ...editingCourse, name: e.target.value })
+            }
+          />
+          <FormControl
+            className="mb-2"
+            placeholder="Course Description"
+            value={editingCourse.description}
+            onChange={(e) =>
+              setEditingCourse({
+                ...editingCourse,
+                description: e.target.value,
+              })
+            }
+          />
+          <Button
+            variant="success"
+            onClick={() => {
+              updateCourse(editingCourse);
+              setEditingCourse(null);
+            }}
+          >
+            Save Changes
+          </Button>
+          <Button
+            variant="secondary"
+            className="ms-2"
+            onClick={() => setEditingCourse(null)}
+          >
+            Cancel
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
-
-// Faculty Section Component: Allows faculty to add, edit, and update courses
-const FacultySection = ({
-  course,
-  courseName,
-  setCourseName,
-  setCourse,
-  addNewCourse,
-  updateCourse,
-}: {
-  course: any;
-  courseName: string;
-  setCourseName: React.Dispatch<React.SetStateAction<string>>;
-  setCourse: (course: any) => void;
-  addNewCourse: () => void;
-  updateCourse: () => void;
-}) => (
-  <div className="faculty-section">
-    <h5>Create New Course</h5>
-    <FormControl
-      className="mb-2"
-      placeholder="Enter New Course Name"
-      value={courseName}
-      onChange={(e) => setCourseName(e.target.value)}
-    />
-    <Button
-      variant="primary"
-      className="mb-3"
-      onClick={() => {
-        setCourse({ ...course, name: courseName });
-        addNewCourse();
-        setCourseName("");
-      }}
-    >
-      + Add Course
-    </Button>
-    <hr />
-    <div className="update-course-section">
-      <Button variant="warning" onClick={updateCourse}>
-        Update
-      </Button>
-      <Form.Control
-        value={course.name}
-        className="mb-2"
-        onChange={(e) => setCourse({ ...course, name: e.target.value })}
-      />
-      <Form.Control
-        as="textarea"
-        value={course.description}
-        rows={3}
-        onChange={(e) => setCourse({ ...course, description: e.target.value })}
-      />
-    </div>
-  </div>
-);
-
-// Published Courses Component: Displays the list of published courses
-const PublishedCourses = ({
-  courses,
-  deleteCourse,
-  setCourse,
-}: {
-  courses: any[];
-  deleteCourse: (courseId: string) => void;
-  setCourse: (course: any) => void;
-}) => (
-  <div className="published-courses">
-    <h2>Published Courses ({courses.length})</h2>
-    <hr />
-    <Row xs={1} md={5} className="g-4">
-      {courses.map((course) => (
-        <Col key={course._id} className="course-card-col">
-          <CourseCard
-            course={course}
-            deleteCourse={deleteCourse}
-            setCourse={setCourse}
-          />
-        </Col>
-      ))}
-    </Row>
-  </div>
-);
-
-// Course Card Component: Displays individual course details
-const CourseCard = ({
-  course,
-  deleteCourse,
-  setCourse,
-}: {
-  course: any;
-  deleteCourse: (courseId: string) => void;
-  setCourse: (course: any) => void;
-}) => (
-  <Card className="course-card">
-    <Link to={`/Kambaz/Courses/${course._id}/Home`} className="course-link text-decoration-none text-dark">
-      <Card.Img src={course.image || "/images/ood.jpeg"} variant="top" width="100%" height={160} />
-      <Card.Body>
-        <Card.Title className="course-title">{course.name}</Card.Title>
-        <Card.Text className="course-description">{course.description}</Card.Text>
-        <Button variant="primary">Go</Button>
-
-        <CourseActions
-          course={course}
-          deleteCourse={deleteCourse}
-          setCourse={setCourse}
-        />
-      </Card.Body>
-    </Link>
-  </Card>
-);
-
-// Course Actions Component: Provides the edit and delete buttons for faculty
-const CourseActions = ({
-  course,
-  deleteCourse,
-  setCourse,
-}: {
-  course: any;
-  deleteCourse: (courseId: string) => void;
-  setCourse: (course: any) => void;
-}) => (
-  <>
-    <button
-      onClick={(e) => {
-        e.preventDefault();
-        deleteCourse(course._id);
-      }}
-      className="btn btn-danger float-end"
-    >
-      Delete
-    </button>
-    <button
-      onClick={(e) => {
-        e.preventDefault();
-        setCourse(course);
-      }}
-      className="btn btn-warning me-2 float-end"
-    >
-      Edit
-    </button>
-  </>
-);
-
