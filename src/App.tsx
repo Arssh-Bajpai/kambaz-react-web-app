@@ -1,5 +1,4 @@
-// The App component is the root component that imports other components
-// to break up the HTML rendering task amongst a hierarchy of components
+
 import Labs from "./Labs";
 import { HashRouter, Route, Routes, Navigate } from "react-router-dom";
 import Kambaz from "./Kambaz";

@@ -39,13 +39,14 @@ export default function Courses({ courses }: { courses: any[]; }) {
               path="Assignments/:aid" 
               element={
                 <AssignmentEditor
-                  show={true}  
-                  handleClose={() => {}}
+                  show={true}
+                  handleClose={() => { } }
                   dialogTitle="Create Assignment"
                   assignmentName={assignmentName}
                   setAssignmentName={setAssignmentName}
-                  addAssignment={addAssignment}
-                />
+                  addAssignment={addAssignment} updateAssignment={function (): void {
+                    throw new Error("Function not implemented.");
+                  } }                />
               }
             />
             <Route path="People" element={<PeopleTable />} />
