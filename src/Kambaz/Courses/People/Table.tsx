@@ -1,48 +1,34 @@
-import { useParams } from "react-router-dom";
+import { Table } from "react-bootstrap";
 import { FaUserCircle } from "react-icons/fa";
-import users from "../../Database/users.json";
-import enrollments from "../../Database/enrollments.json";
+import PeopleDetails from "./Details";
+import { Link } from "react-router-dom";
+export default function PeopleTable({ users = [] }: { users?: any[] }){
 
-import "../../styles.css";
-
-export default function PeopleTable() {
-  const { cid } = useParams();
-
-  // Filter the users based on the course ID and enrollment data
-  const filteredUsers = users.filter((user) =>
-    enrollments.some((enrollment) => enrollment.user === user._id && enrollment.course === cid)
-  );
-
-  return (
-    <div id="wd-people-table">
-      <table className="border-spacing-2">
-        <thead>
-          <tr>
-            <th className="border">Name</th>
-            <th className="border">Login ID</th>
-            <th className="border">Section</th>
-            <th className="border">Role</th>
-            <th className="border">Last Activity</th>
-            <th className="border">Total Activity</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredUsers.map((user: any) => (
-            <tr key={user._id} className="border">
-              <td className="wd-full-name text-nowrap border">
-                <FaUserCircle className="me-2 fs-1 text-secondary" />
-                <span className="wd-first-name">{user.firstName} </span>
-                <span className="wd-last-name">{user.lastName}</span>
-              </td>
-              <td className="wd-login-id border">{user.loginId}</td>
-              <td className="wd-section border">{user.section}</td>
-              <td className="wd-role border">{user.role}</td>
-              <td className="wd-last-activity border">{user.lastActivity}</td>
-              <td className="wd-total-activity border">{user.totalActivity}</td>
-            </tr>
-          ))}
+ return (
+  <div id="wd-people-table">
+  <PeopleDetails />
+  <Table striped>
+    <thead>
+     <tr><th>Name</th><th>Login ID</th><th>Section</th><th>Role</th><th>Last Activity</th><th>Total Activity</th></tr>
+    </thead>
+    <tbody>
+  {users
+    .map((user: any) => (
+      <tr key={user._id}>
+        <td className="wd-full-name text-nowrap">
+        <Link to={`/Kambaz/Account/Users/${user._id}`} className="text-decoration-none">
+          <FaUserCircle className="me-2 fs-1 text-secondary" />
+          <span className="wd-first-name">{user.firstName }</span>
+          <span className="wd-last-name">{user.lastName}</span>
+        </Link>
+        </td>
+        <td className="wd-login-id">{user.loginId}</td>
+        <td className="wd-section">{user.section}</td>
+        <td className="wd-role">{user.role}</td>
+        <td className="wd-last-activity">{user.lastActivity}</td>
+        <td className="wd-total-activity">{user.totalActivity}</td>
+      </tr>
+    ))}
         </tbody>
-      </table>
-    </div>
-  );
-}
+   </Table>
+  </div> );}
