@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import * as quizClient from "./client";
-import { Container, Form, Button, Alert } from "react-bootstrap";
+import { Container, Form, Button, Alert, Row, Col } from "react-bootstrap";
 
 export default function QuizPreview() {
   const { qid, cid } = useParams();
@@ -72,13 +72,33 @@ export default function QuizPreview() {
         <div>
           <h2>{quiz.title}</h2>
           <p>{quiz.description}</p>
-          <p className="text-muted">Quiz ID: <code>{quiz._id}</code></p>
         </div>
-        <Button onClick={() => navigate(`/Kambaz/Courses/${cid}/Quizzes/${qid}`)}>
+        <Button onClick={() => navigate(`/Kambaz/Courses/${cid}/Quizzes/${qid}/edit`)}>
           Edit Quiz
         </Button>
       </div>
 
+      {/* Display quiz settings */}
+      <Row className="mb-3">
+        <Col><strong>Quiz Type:</strong> {quiz.quizType}</Col>
+        <Col><strong>Points:</strong> {quiz.points}</Col>
+        <Col><strong>Assignment Group:</strong> {quiz.assignmentGroup}</Col>
+      </Row>
+      <Row className="mb-3">
+        <Col><strong>Shuffle Answers:</strong> {quiz.shuffleAnswers ? "Yes" : "No"}</Col>
+        <Col><strong>Time Limit:</strong> {quiz.timeLimit} minutes</Col>
+        <Col><strong>Multiple Attempts:</strong> {quiz.multipleAttempts ? "Yes" : "No"}</Col>
+      </Row>
+      <Row className="mb-3">
+        <Col><strong>Show Correct Answers:</strong> {quiz.showCorrectAnswers}</Col>
+        <Col><strong>One Question at a Time:</strong> {quiz.oneQuestionAtATime ? "Yes" : "No"}</Col>
+        <Col><strong>Webcam Required:</strong> {quiz.webcamRequired ? "Yes" : "No"}</Col>
+      </Row>
+      <Row className="mb-3">
+        <Col><strong>Lock Questions After Answering:</strong> {quiz.lockQuestionsAfterAnswering ? "Yes" : "No"}</Col>
+      </Row>
+
+      {/* Display question list */}
       {questions.map((q, idx) => (
         <div key={q._id} className="border rounded p-3 mb-3">
           <h5>{idx + 1}. {q.qtitle}</h5>
@@ -153,6 +173,7 @@ export default function QuizPreview() {
         </div>
       ))}
 
+      {/* Submit or review results */}
       {submitted ? (
         <div className="mt-3">
           <Alert variant="info">
