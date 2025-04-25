@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
 import * as coursesClient from "../client";
 import * as modulesClient from "./client";
 // import { v4 as uuidv4 } from "uuid";
-import { FormControl, ListGroup } from "react-bootstrap";
+import { ListGroup } from "react-bootstrap";
 import { setModules, addModule, editModule, updateModule, deleteModule } from "./reducer";
 import { useSelector, useDispatch } from "react-redux";
 

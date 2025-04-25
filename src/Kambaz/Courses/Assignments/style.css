@@ -1,0 +1,14 @@
+#search-buttons-top {
+    margin-bottom: 8px;
+}
+
+.wd-assignment-link {
+    color: black !important;
+    text-decoration: none !important;
+  }
+  
+  .wd-assignment-link:hover {
+    color: black;  /* Keeps the text black on hover */
+    text-decoration: underline !important
+  }
+  

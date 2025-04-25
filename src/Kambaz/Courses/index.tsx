@@ -1,5 +1,6 @@
 import CourseNavigation from "./Navigation";
 import Modules from "./Modules";
+import Quizzes from "./Quizzes/index.tsx";
 import Home from "./Home/index.tsx";
 import { Navigate, Route, Routes, useParams, useLocation } from "react-router";
 import Assignments from "./Assignments";
@@ -47,6 +48,7 @@ export default function Courses({ courses }: { courses: any[]; }) {
           <Route path="Assignments" element={<Assignments />} />
           <Route path="Assignments/:aid" element={<AssignmentEditor />} />
           <Route path="People" element={<PeopleTable users={users} />} />
+          <Route path="Quizzes" element={<Quizzes />} />
         </Routes>
 
       </div>

@@ -18,47 +18,53 @@ export default function AssignmentEditor() {
     module: "Multiple Modules",
   });
 
-  const isCreateMode = aid === "new";
-
   useEffect(() => {
     const loadAssignment = async () => {
-      if (!isCreateMode && aid) {
-        const existing = await assignmentClient.findAssignment(aid);
-        setAssignment(existing);
+      if (aid !== "new") {
+        const existing = await assignmentClient.findAssignment(aid!);
+        if (existing) {
+          setAssignment(existing);
+        } else {
+          setAssignment({
+            title: "",
+            description: "",
+            points: "100",
+            due: "",
+            available: "",
+            availableUntil: "",
+            course: cid,
+            module: "Multiple Modules",
+          });
+        }
       }
     };
     loadAssignment();
   }, [aid]);
 
   const save = async () => {
-    if (isCreateMode) {
-      await assignmentClient.createAssignmentForCourse(cid!, assignment);
+    if (aid === "new") {
+      await assignmentClient.createAssignment(cid!, assignment);
     } else {
       await assignmentClient.updateAssignment(assignment);
     }
     navigate(`/Kambaz/Courses/${cid}/Assignments`);
   };
 
-  const updateField = (key: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+  const u = (key: string) => (e: any) =>
     setAssignment({ ...assignment, [key]: e.target.value });
 
   return (
     <Container>
       <div id="wd-assignments-editor">
         <Form.Label htmlFor="title">Assignment Name</Form.Label>
-        <Form.Control
-          className="mb-2"
-          id="title"
-          value={assignment.title}
-          onChange={updateField("title")}
-        />
+        <Form.Control className="mb-2" id="title" value={assignment.title} onChange={u("title")} />
 
         <Form.Label htmlFor="description">Description</Form.Label>
         <textarea
           id="description"
           className="w-100 mb-2"
           value={assignment.description}
-          onChange={updateField("description")}
+          onChange={u("description")}
         />
 
         <Row className="mb-2">
@@ -66,12 +72,7 @@ export default function AssignmentEditor() {
             <Form.Label className="wd-points">Points</Form.Label>
           </Col>
           <Col>
-            <Form.Control
-              id="points"
-              type="number"
-              value={assignment.points}
-              onChange={updateField("points")}
-            />
+            <Form.Control id="points" value={assignment.points} onChange={u("points")} />
           </Col>
         </Row>
 
@@ -81,12 +82,7 @@ export default function AssignmentEditor() {
               <Form.Label htmlFor="due">Due Date</Form.Label>
             </Col>
             <Col>
-              <Form.Control
-                id="due"
-                type="date"
-                value={assignment.due}
-                onChange={updateField("due")}
-              />
+              <Form.Control id="due" type="date" value={assignment.due} onChange={u("due")} />
             </Col>
           </Row>
 
@@ -99,7 +95,7 @@ export default function AssignmentEditor() {
                 id="available"
                 type="date"
                 value={assignment.available}
-                onChange={updateField("available")}
+                onChange={u("available")}
               />
             </Col>
             <Col className="text-end">
@@ -110,21 +106,28 @@ export default function AssignmentEditor() {
                 id="availableUntil"
                 type="date"
                 value={assignment.availableUntil}
-                onChange={updateField("availableUntil")}
+                onChange={u("availableUntil")}
               />
             </Col>
           </Row>
         </div>
 
         <div className="right-aligned-assignment-editor-buttons justify-content-end mt-2">
-          <Button size="lg" className="me-1 float-end" variant="danger" onClick={save}>
+          <Button
+            size="lg"
+            className="me-1 float-end"
+            variant="danger"
+            onClick={save}
+          >
             Save
           </Button>
           <Button
             size="lg"
             className="me-1 float-end"
             variant="outline-secondary"
-            onClick={() => navigate(`/Kambaz/Courses/${cid}/Assignments`)}
+            onClick={() =>
+              navigate(`/Kambaz/Courses/${cid}/Assignments`)
+            }
           >
             Cancel
           </Button>

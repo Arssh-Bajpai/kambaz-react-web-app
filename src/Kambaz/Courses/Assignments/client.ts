@@ -1,42 +1,29 @@
 import axios from "axios";
+axios.defaults.withCredentials = true;
 
 const REMOTE_SERVER = import.meta.env.VITE_REMOTE_SERVER;
 const COURSES_API = `${REMOTE_SERVER}/api/courses`;
 const ASSIGNMENTS_API = `${REMOTE_SERVER}/api/assignments`;
-const axiosWithCreds = axios.create({ withCredentials: true });
-
-/** ---------- ASSIGNMENTS BY COURSE ---------- **/
-
+const axiosWithCredentials = axios.create({ withCredentials: true });
 export const findAssignmentsForCourse = async (courseId: string) => {
-  const response = await axiosWithCreds.get(`${COURSES_API}/${courseId}/assignments`);
-  return response.data;
+  const { data } = await axiosWithCredentials.get(`${COURSES_API}/${courseId}/assignments`);
+  return data;
 };
-
-export const createAssignmentForCourse = async (courseId: string, assignment: any) => {
-  const response = await axiosWithCreds.post(`${COURSES_API}/${courseId}/assignments`, assignment);
-  return response.data;
+export const createAssignment = async (courseId: string, assignment: any) => {
+  const { data } = await axiosWithCredentials.post(`${COURSES_API}/${courseId}/assignments`, assignment);
+  return data;
 };
-
-/** ---------- INDIVIDUAL ASSIGNMENTS ---------- **/
-
-export const findAssignment = async (assignmentId: string) => {
-  const response = await axiosWithCreds.get(`${ASSIGNMENTS_API}/${assignmentId}`);
-  return response.data;
-};
-
 export const updateAssignment = async (assignment: any) => {
-  const response = await axiosWithCreds.put(`${ASSIGNMENTS_API}/${assignment._id}`, assignment);
-  return response.data;
+  const { data } = await axiosWithCredentials.put(`${ASSIGNMENTS_API}/${assignment._id}`, assignment);
+  return data;
 };
-
 export const deleteAssignment = async (assignmentId: string) => {
-  const response = await axiosWithCreds.delete(`${ASSIGNMENTS_API}/${assignmentId}`);
-  return response.data;
+  const { data } = await axiosWithCredentials.delete(`${ASSIGNMENTS_API}/${assignmentId}`);
+  return data;
 };
 
-/** ---------- OPTIONAL: ADMIN-STYLE FUNCTIONS ---------- **/
-
-export const fetchAllAssignments = async () => {
-  const response = await axiosWithCreds.get(ASSIGNMENTS_API);
-  return response.data;
+export const findAssignment = async (aid: string) => {
+  const { data } = await axiosWithCredentials.get(`${ASSIGNMENTS_API}/${aid}`);
+  return data;
 };
+
