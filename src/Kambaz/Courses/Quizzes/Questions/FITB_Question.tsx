@@ -10,11 +10,6 @@ export default function FillInTheBlankEditor() {
   const { qid, cid } = useParams(); 
   const navigate = useNavigate();
 
-  const { questionId } = useParams();
-  const [questions, setQuestions] = useState<any[]>([]);
-
-
-
   const [question, setQuestion] = useState({
     _id: uuidv4(),
     qid: "",
@@ -25,35 +20,10 @@ export default function FillInTheBlankEditor() {
     type: "fitb",
   });
 
-  useEffect(() => {
-    if (questionId) {
-      const load = async () => {
-        const existing = await questionClient.findQuestionById(qid!, questionId);
-        setQuestion(existing);
-      };
-      load();
-    }
-  }, [questionId]);
-  
   const saveQuestion = async () => {
-    if (!qid) return;
-  
-    try {
-      if (question._id && question) {
-        // Update the existing question
-        await questionClient.updateQuestion(qid, question._id, question);
-      } else {
-        // Create a new question
-        const created = await questionClient.createQuestionForQuiz(qid, question);
-        setQuestions([...questions, created]);
-      }
-  
-      navigate(`/Kambaz/Courses/${cid}/Quizzes/${qid}`);
-    } catch (err) {
-      console.error("Failed to save question:", err);
-    }
+    await questionClient.createQuestionForQuiz(qid!, question);
+    navigate(`/Kambaz/Courses/${cid}/Quizzes/${qid}`);
   };
-  
 
   return (
     <Form className="p-3">

@@ -1,3 +1,14 @@
+// import { Routes, Route, Navigate }
+//   from "react-router";
+// import Account from "./Account";
+// import Dashboard from "./Dashboard";
+// import KambazNavigation from "./Navigation";
+// import "./styles.css";
+// import * as db from "./Database";
+// import { useState } from "react";
+// import { v4 as uuidv4 } from "uuid";
+
+// import Courses from "./Courses";
 
 import KambazNavigation from "./Navigation";
 import Session from "./Account/Session";
@@ -7,12 +18,15 @@ import { useSelector } from "react-redux";
 
 import Dashboard from "./Dashboard";
 import Courses from "./Courses";
+// import * as db from "./Database";
 import * as userClient from "./Account/client";
 import * as courseClient from "./Courses/client";
 import { useState, useEffect } from "react";
+//import { v4 as uuidv4 } from "uuid";
 import ProtectedRoute from "./Account/ProtectedRoute";
 import AssignmentEditor from "./Courses/Assignments/Editor";
 import axios from "axios";
+
 axios.defaults.withCredentials = true;
 
 
@@ -45,6 +59,8 @@ export default function Kambaz() {
       })
     );
   };
+  //const [assignments, setAssignments] = useState<any[]>([]);
+
   const { currentUser } = useSelector((state: any) => state.accountReducer);
   const fetchCourses = async () => {
     try {
@@ -58,6 +74,8 @@ export default function Kambaz() {
   useEffect(() => {
     fetchCourses();
   }, [currentUser]);
+
+  
 
 
 
@@ -82,12 +100,10 @@ export default function Kambaz() {
               deleteCourse={deleteCourse}
               updateCourse={updateCourse}/></ProtectedRoute>
           } />
-
-
-
             <Route path="Courses/:cid/Assignments/new" element={ <ProtectedRoute> <AssignmentEditor 
             /> </ProtectedRoute>
             } />
+              
 
             <Route path="Courses/:cid/*" element={<ProtectedRoute> <Courses courses={courses} /></ProtectedRoute>} />
               <Route path="/Calendar" element={<h1>Calendar</h1>} />
@@ -100,3 +116,28 @@ export default function Kambaz() {
     </div>
   );
 }
+
+
+// export default function Kambaz() {
+//   return (
+//     <div id="wd-kambaz">
+//       <table>
+//         <tr>
+//           <td valign="top">
+//             <KambazNavigation />
+//           </td>
+//           <td valign="top">
+//             <Routes>
+//               <Route path="/" element={<Navigate to="Account" />} />
+//               <Route path="/Account/*" element={<Account />} />
+//               <Route path="/Dashboard" element={<Dashboard />} />
+//               <Route path="/Courses/:cid/*" element={<Courses />} />
+//               <Route path="/Calendar" element={<h1>Calendar</h1>} />
+//               <Route path="/Inbox" element={<h1>Inbox</h1>} />
+//             </Routes>
+//           </td>
+//         </tr>
+//       </table>
+//     </div>
+//   );
+// }

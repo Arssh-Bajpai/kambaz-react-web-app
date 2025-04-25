@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import * as quizClient from "./client";
-import { Container, Form, Button, Alert, Row, Col } from "react-bootstrap";
+import { Container, Form, Button, Alert } from "react-bootstrap";
 
 export default function QuizPreview() {
   const { qid, cid } = useParams();
@@ -50,7 +50,7 @@ export default function QuizPreview() {
     setSubmitted(true);
 
     try {
-      console.log("Submitting attempt:", { qid, score: total });
+      console.log("🔍 Submitting attempt:", { qid, score: total });
       await quizClient.submitAttempt(qid!, total);
       const updatedQuiz = await quizClient.findQuiz(qid!);
       setQuiz(updatedQuiz);
@@ -72,87 +72,13 @@ export default function QuizPreview() {
         <div>
           <h2>{quiz.title}</h2>
           <p>{quiz.description}</p>
+          <p className="text-muted">Quiz ID: <code>{quiz._id}</code></p>
         </div>
-        <div>
-          <Button
-            className="me-2"
-            variant="outline-secondary"
-            onClick={() => navigate(`/Kambaz/Courses/${cid}/Quizzes/${qid}`)}
-          >
-            Edit Quiz
-          </Button>
-          <Button
-            variant="outline-primary"
-            onClick={() => navigate(`/Kambaz/Courses/${cid}/Quizzes/${qid}`)}
-          >
-            Preview
-          </Button>
-        </div>
+        <Button onClick={() => navigate(`/Kambaz/Courses/${cid}/Quizzes/${qid}`)}>
+          Edit Quiz
+        </Button>
       </div>
 
-      {/* Display quiz details in a formatted way */}
-      <Row className="mb-3">
-        <Col><strong>Quiz Type</strong></Col>
-        <Col>{quiz.quizType}</Col>
-      </Row>
-      <Row className="mb-3">
-        <Col><strong>Points</strong></Col>
-        <Col>{quiz.points}</Col>
-      </Row>
-      <Row className="mb-3">
-        <Col><strong>Assignment Group</strong></Col>
-        <Col>{quiz.assignmentGroup}</Col>
-      </Row>
-      <Row className="mb-3">
-        <Col><strong>Shuffle Answers</strong></Col>
-        <Col>{quiz.shuffleAnswers ? "Yes" : "No"}</Col>
-      </Row>
-      <Row className="mb-3">
-        <Col><strong>Time Limit</strong></Col>
-        <Col>{quiz.timeLimit} Minutes</Col>
-      </Row>
-      <Row className="mb-3">
-        <Col><strong>Multiple Attempts</strong></Col>
-        <Col>{quiz.multipleAttempts ? "Yes" : "No"}</Col>
-      </Row>
-      <Row className="mb-3">
-        <Col><strong>View Responses</strong></Col>
-        <Col>{quiz.viewResponses}</Col>
-      </Row>
-      <Row className="mb-3">
-        <Col><strong>Show Correct Answers</strong></Col>
-        <Col>{quiz.showCorrectAnswers}</Col>
-      </Row>
-      <Row className="mb-3">
-        <Col><strong>One Question at a Time</strong></Col>
-        <Col>{quiz.oneQuestionAtATime ? "Yes" : "No"}</Col>
-      </Row>
-      <Row className="mb-3">
-        <Col><strong>Require Respondus LockDown Browser</strong></Col>
-        <Col>{quiz.requireRespondusLockDown ? "Yes" : "No"}</Col>
-      </Row>
-      <Row className="mb-3">
-        <Col><strong>Webcam Required</strong></Col>
-        <Col>{quiz.webcamRequired ? "Yes" : "No"}</Col>
-      </Row>
-      <Row className="mb-3">
-        <Col><strong>Lock Questions After Answering</strong></Col>
-        <Col>{quiz.lockQuestionsAfterAnswering ? "Yes" : "No"}</Col>
-      </Row>
-      <Row className="mb-3">
-        <Col><strong>Due Date</strong></Col>
-        <Col>{quiz.due}</Col>
-      </Row>
-      <Row className="mb-3">
-        <Col><strong>Available From</strong></Col>
-        <Col>{quiz.available}</Col>
-      </Row>
-      <Row className="mb-3">
-        <Col><strong>Available Until</strong></Col>
-        <Col>{quiz.availableUntil}</Col>
-      </Row>
-
-      {/* Questions Section */}
       {questions.map((q, idx) => (
         <div key={q._id} className="border rounded p-3 mb-3">
           <h5>{idx + 1}. {q.qtitle}</h5>
@@ -263,7 +189,7 @@ export default function QuizPreview() {
 
       {quiz.attempts?.length > 0 && (
         <div className="mt-5">
-          <h4> Attempt History</h4>
+          <h4>📜 Attempt History</h4>
           <ul className="list-group">
             {quiz.attempts.map((a: any, i: number) => (
               <li key={a._id} className="list-group-item d-flex justify-content-between">

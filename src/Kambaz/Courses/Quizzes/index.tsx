@@ -110,7 +110,7 @@ export default function Quizzes() {
                   <div className="d-flex align-items-center">
                     <BsGripVertical className="me-2 fs-3" />
                     <Link
-                      to={`/Kambaz/Courses/${cid}/Quizzes/${quiz._id}/preview`}
+                      to={`/Kambaz/Courses/${cid}/Quizzes/${quiz._id}`}
                       className="wd-quiz-link fw-bold"
                     >
                       {quiz.title}
@@ -149,7 +149,7 @@ export default function Quizzes() {
                         <Dropdown.Menu>
                           <Dropdown.Item
                             onClick={() =>
-                              n(`/Kambaz/Courses/${cid}/Quizzes/${quiz._id}`)
+                              n(`/Kambaz/Courses/${cid}/Quizzes/${quiz._id}/edit`)
                             }
                           >
                             Edit
