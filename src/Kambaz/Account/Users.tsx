@@ -71,4 +71,3 @@ export default function Users() {
       <PeopleTable users={users} />
    </div>
 );}
-
