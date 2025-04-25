@@ -36,10 +36,40 @@ export default function TrueFalseEditor() {
     fetchQuestions();}, [qid]);
 
 
+  // const saveQuestion = async () => {
+  //   await questionClient.createQuestionForQuiz(qid!, question);
+  //   setQuestions([...questions, question]);
+  //   n(`/Kambaz/Courses/${cid}/Quizzes/${qid}`);
+  // };
+
+  const { questionId } = useParams();
+  useEffect(() => {
+    if (questionId) {
+      const load = async () => {
+        const existing = await questionClient.findQuestionById(qid!, questionId);
+        setQuestion(existing);
+      };
+      load();
+    }
+  }, [questionId]);
+  
   const saveQuestion = async () => {
-    await questionClient.createQuestionForQuiz(qid!, question);
-    setQuestions([...questions, question]);
-    n(`/Kambaz/Courses/${cid}/Quizzes/${qid}`);
+    if (!qid) return;
+  
+    try {
+      if (question._id && question) {
+        // Update the existing question
+        await questionClient.updateQuestion(qid, question._id, question);
+      } else {
+        // Create a new question
+        const created = await questionClient.createQuestionForQuiz(qid, question);
+        setQuestions([...questions, created]);
+      }
+  
+      n(`/Kambaz/Courses/${cid}/Quizzes/${qid}`);
+    } catch (err) {
+      console.error("Failed to save question:", err);
+    }
   };
 
 

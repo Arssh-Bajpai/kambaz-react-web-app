@@ -19,7 +19,7 @@ export default function QuizEditor() {
     assignmentGroup: "Quizzes",
     shuffleAnswers: true,
     timeLimit: 20,
-    multipleAttempts: false,
+    maxAttempts: 1,
     showCorrectAnswers: "",
     accessCode: "",
     oneQuestionAtATime: true,
@@ -30,6 +30,7 @@ export default function QuizEditor() {
     availableUntil: "",
     course: cid,
     published: false,
+    attempts: [],
   });
 
   useEffect(() => {
@@ -42,44 +43,58 @@ export default function QuizEditor() {
     loadQuiz();
   }, [qid]);
 
+  // Save logic to create or update quiz
   const save = async () => {
     try {
+      const updatedQuiz = { ...quiz, published: false }; // Set published to false by default
+
+      // Check if this is a new quiz or an existing one
       if (qid === "new") {
-        const created = await quizClient.createQuizForCourse(cid!, quiz);
+        // Creating a new quiz for the course
+        const created = await quizClient.createQuizForCourse(cid!, updatedQuiz);
         console.log("Created quiz:", created);
+
         if (created?._id) {
+          // Successfully created the quiz, update the state and navigate
           setQuiz(created);
           navigate(`/Kambaz/Courses/${cid}/Quizzes/${created._id}`);
         } else {
+          // Failed to create the quiz
           console.error("Quiz creation failed or ID missing:", created);
+          alert("Failed to create the quiz.");
         }
       } else {
-        const updated = await quizClient.updateQuiz(quiz);
-        setQuiz(updated); 
+        // Updating an existing quiz
+        const updated = await quizClient.updateQuiz(updatedQuiz);
+        console.log("Updated quiz:", updated);
+
+        // Update the quiz state and navigate
+        setQuiz(updated);
         navigate(`/Kambaz/Courses/${cid}/Quizzes`);
       }
     } catch (err) {
       console.error("Error saving quiz:", err);
+      alert("Could not save the quiz.");
     }
   };
 
+  // Save and publish logic
   const saveAndPublish = async () => {
     try {
       const updatedQuiz = { ...quiz, published: true };
-  
+
       if (qid === "new") {
         const created = await quizClient.createQuizForCourse(cid!, updatedQuiz);
         console.log("Created and published quiz:", created);
-  
+
         if (created?._id) {
           navigate(`/Kambaz/Courses/${cid}/Quizzes`);
         } else {
           alert("Something went wrong creating the quiz!");
         }
       } else {
-        const updated = await quizClient.updateQuiz(quiz);
-        setQuiz(updated); 
-        // navigate(`/Kambaz/Courses/${cid}/Quizzes/${updated._id}`);
+        const updated = await quizClient.updateQuiz(updatedQuiz);
+        setQuiz(updated);
         navigate(`/Kambaz/Courses/${cid}/Quizzes`);
       }
     } catch (err) {
@@ -87,47 +102,65 @@ export default function QuizEditor() {
       alert("Could not save and publish quiz.");
     }
   };
-  
+
   const handleAddQuestion = async () => {
     if (!quiz._id || qid === "new") {
       const created = await quizClient.createQuizForCourse(cid!, quiz);
       setQuiz(created);
-      navigate(`/Kambaz/Courses/${cid}/Quizzes/${created._id}/new/${questionType}`);
+      // Navigate to the new question editor based on the selected question type
+      switch (questionType) {
+        case "mcq":
+          navigate(`/Kambaz/Courses/${cid}/Quizzes/${created._id}/new/mcq`);
+          break;
+        case "tf":
+          navigate(`/Kambaz/Courses/${cid}/Quizzes/${created._id}/new/tf`);
+          break;
+        case "fitb":
+          navigate(`/Kambaz/Courses/${cid}/Quizzes/${created._id}/new/fitb`);
+          break;
+        default:
+          break;
+      }
     } else {
-      navigate(`/Kambaz/Courses/${cid}/Quizzes/${quiz._id}/new/${questionType}`);
+      switch (questionType) {
+        case "mcq":
+          navigate(`/Kambaz/Courses/${cid}/Quizzes/${quiz._id}/new/mcq`);
+          break;
+        case "tf":
+          navigate(`/Kambaz/Courses/${cid}/Quizzes/${quiz._id}/new/tf`);
+          break;
+        case "fitb":
+          navigate(`/Kambaz/Courses/${cid}/Quizzes/${quiz._id}/new/fitb`);
+          break;
+        default:
+          break;
+      }
     }
   };
   
+
   const [questions, setQuestions] = useState<any[]>([]);
 
-useEffect(() => {
-  const loadQuestions = async () => {
-    if (qid) {
-      const res = await quizClient.findQuestionsForQuiz(qid);
-      setQuestions(res);
+  useEffect(() => {
+    const loadQuestions = async () => {
+      if (qid) {
+        const res = await quizClient.findQuestionsForQuiz(qid);
+        setQuestions(res);
+      }
+    };
+    loadQuestions();
+  }, [qid]);
+
+  const handleDelete = async (questionId: string) => {
+    const confirmDelete = window.confirm("Are you sure you'd like to delete this question?");
+    if (!confirmDelete) return;
+    try {
+      await quizClient.deleteQuestion(quiz._id, questionId);
+      setQuestions(questions.filter((q) => q._id !== questionId));
+    } catch (err) {
+      console.error("Failed to delete question:", err);
     }
   };
-  loadQuestions();
-}, [qid]);
-
-// const handleDelete = async (qid: string) => {
-//   await quizClient.deleteQuestion(quiz._id, qid);
-//   setQuestions(questions.filter(q => q._id !== qid));
-// };
-
-const handleDelete = async (questionId: string) => {
-  const confirmDelete = window.confirm("Are you sure you'd like to delete this question?");
-  if (!confirmDelete) return;
-  try {
-    await quizClient.deleteQuestion(quiz._id, questionId);
-    setQuestions(questions.filter((q) => q._id !== questionId));
-  } catch (err) {
-    console.error(" Failed to delete question:", err);
-  }
-};
-
-  
-  
 
   const u = (key: string) => (e: any) =>
     setQuiz({
@@ -216,11 +249,13 @@ const handleDelete = async (questionId: string) => {
               </Col>
             </Row>
 
-            <Form.Check
-              label="Multiple Attempts"
-              checked={quiz.multipleAttempts}
-              onChange={u("multipleAttempts")}
+            <p>Max Number of Attempts:</p>
+            <Form.Control
+              type="number"
+              value={quiz.maxAttempts}
+              onChange={u("maxAttempts")}
             />
+
             <Form.Control
               className="mb-2"
               placeholder="Show Correct Answers"
@@ -295,8 +330,7 @@ const handleDelete = async (questionId: string) => {
             </div>
           </Tab>
 
-          {/* <Tab eventKey="questions" title="Questions">
-            <div></div>
+          <Tab eventKey="questions" title="Questions">
             <Form.Group className="mb-3 mt-3">
               <Form.Label>Question Type</Form.Label>
               <Form.Select
@@ -308,77 +342,66 @@ const handleDelete = async (questionId: string) => {
                 <option value="fitb">Fill in the Blank</option>
               </Form.Select>
             </Form.Group>
-            <Button
-              variant="danger"
-              onClick={handleAddQuestion}
-            >
+
+            <Button variant="danger" onClick={handleAddQuestion} className="mb-4">
               Add New Question
             </Button>
-          </Tab> */}
 
-<Tab eventKey="questions" title="Questions">
-  <Form.Group className="mb-3 mt-3">
-    <Form.Label>Question Type</Form.Label>
-    <Form.Select
-      value={questionType}
-      onChange={(e) => setQuestionType(e.target.value)}
-    >
-      <option value="mcq">Multiple Choice</option>
-      <option value="tf">True/False</option>
-      <option value="fitb">Fill in the Blank</option>
-    </Form.Select>
-  </Form.Group>
+            {questions.length === 0 && (
+              <div className="text-muted">No questions added yet.</div>
+            )}
 
-  <Button variant="danger" onClick={handleAddQuestion} className="mb-4">
-    Add New Question
-  </Button>
+            {questions.map((q, i) => (
+              <div key={q._id} className="border rounded p-3 mb-3 bg-light">
+                <h5 className="text-dark">{q.qtitle || `Question ${i + 1}`}</h5>
+                <div dangerouslySetInnerHTML={{ __html: q.question_text }} />
+                <div className="mt-2">
+                  Points: {q.points}
+                </div>
 
-  {questions.length === 0 && (
-    <div className="text-muted">No questions added yet.</div>
-  )}
+                {q.type === "mcq" && (
+                  <ul className="mt-2">
+                    {q.answers.map((a: any, idx: any) => (
+                      <li key={idx}>
+                        {a.text} {a.isCorrect && <p>(correct answer)</p>}
+                      </li>
+                    ))}
+                  </ul>
+                )}
 
-  {questions.map((q, i) => (
-    <div key={q._id} className="border rounded p-3 mb-3 bg-light">
-      <h5 className="text-dark">{q.qtitle || `Question ${i + 1}`}</h5>
-      <div dangerouslySetInnerHTML={{ __html: q.question_text }} />
-      <div className="mt-2">
-        Points: {q.points}
-      </div>
+                {q.type === "tf" && (
+                  <div className="mt-2">
+                    Correct Answer is:{q.answer ? "True" : "False"}
+                  </div>
+                )}
 
-      {q.type === "mcq" && (
-        <ul className="mt-2">
-          {q.answers.map((a: any, idx: any) => (
-            <li key={idx}>
-              {a.text} {a.isCorrect && <p>(correct answer)</p>}
-            </li>
-          ))}
-        </ul>
-      )}
+                {q.type === "fitb" && (
+                  <div className="mt-2">
+                    Correct Answer is: {q.answer}
+                  </div>
+                )}
 
-      {q.type === "tf" && (
-        <div className="mt-2">
-          Correct Answer is:{q.answer ? "True" : "False"}
-        </div>
-      )}
-
-      {q.type === "fitb" && (
-        <div className="mt-2">
-          Correct Answe is: {q.answer}
-        </div>
-      )}
-
-      <Button
-        variant="outline-danger"
-        size="sm"
-        onClick={() => handleDelete(q._id)}
-        className="mt-3"
-      >
-        Delete
-      </Button>
-    </div>
-  ))}
-</Tab>
-
+                <Button
+                  variant="outline-danger"
+                  size="sm"
+                  onClick={() => handleDelete(q._id)}
+                  className="mt-3"
+                >
+                  Delete
+                </Button>
+                <Button
+                  variant="outline-primary"
+                  size="sm"
+                  className="mt-3"
+                  onClick={() =>
+                    navigate(`/Kambaz/Courses/${cid}/Quizzes/${qid}/edit/${q._id}`)
+                  }
+                >
+                  Edit
+                </Button>
+              </div>
+            ))}
+          </Tab>
         </Tabs>
       </div>
     </Container>

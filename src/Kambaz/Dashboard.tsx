@@ -1,12 +1,11 @@
 
-
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 //import { Link } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { addCourse } from "./Courses/reducer";
 import { Card, FormControl, Button } from "react-bootstrap";
-//import EnrollmentButtonUpdated from "./Enrollments/EnrollmentButton";
+import EnrollmentButtonUpdated from "./Enrollments/EnrollmentButton";
 import { useNavigate } from "react-router-dom";
 
 
@@ -18,9 +17,6 @@ export default function Dashboard({
   //addNewCourse,
   deleteCourse,
   updateCourse,
-  enrolling, 
-  setEnrolling, 
-  updateEnrollment
 }: {
   courses: any[];
   course: any;
@@ -28,13 +24,10 @@ export default function Dashboard({
   addNewCourse: () => void;
   deleteCourse: (courseId: any) => void;
   updateCourse: () => void;
-  enrolling: boolean; setEnrolling: (enrolling: boolean) => void;
-  updateEnrollment: (courseId: string, enrolled: boolean) => void;
 }) {
   const dispatch = useDispatch();
-  //const { courses } = useSelector((state: any) => state.courseReducer);
   const { currentUser } = useSelector((state: any) => state.accountReducer);
-  //const { enrollments = [] } = useSelector((state: any) => state.enrollmentsReducer);
+  const { enrollments = [] } = useSelector((state: any) => state.enrollmentsReducer);
   const isFacultyTrue = currentUser?.role === "Faculty";
   const isStudentTrue = currentUser?.role === "Student";
   const [courseName, setCourseName] = useState("");
@@ -42,13 +35,14 @@ export default function Dashboard({
 
   const [showEnrollments, setShowEnrollments] = useState(false);
   
+  const isEnrolledTrue = (courseId: string) =>
+    enrollments.some((enrollment: any) => enrollment.user === currentUser._id && enrollment.course === courseId
+    );
+    const displayedCourses = isFacultyTrue ? courses : showEnrollments ? courses
+    : courses.filter((course: any) => isEnrolledTrue(course._id));
   return (
     <div className="p-4" id="wd-dashboard">
-      <h1 id="wd-dashboard-title">Dashboard
-      <button onClick={() => setEnrolling(!enrolling)} className="float-end btn btn-primary" >
-          {enrolling ? "My Courses" : "All Courses"}
-        </button>
-        </h1>
+      <h1 id="wd-dashboard-title">Dashboard</h1>
       <hr />
       {isFacultyTrue ? (
         <div className="mb-4">
@@ -83,7 +77,7 @@ export default function Dashboard({
       ): null }
       
       <div className="row row-cols-1 row-cols-md-4 g-4">
-        {courses.map((course: any) => (
+        {displayedCourses.map((course: any) => (
           <div key={course._id} className="col" style={{ width: "300px" }}>
             <div className="card">
               {/* <Link
@@ -96,16 +90,6 @@ export default function Dashboard({
                 onClick={() => navigate(`/Kambaz/Courses/${course._id}/Home`)}
                 />
                 <Card.Body className="card-body">
-                {enrolling && (
-              <button onClick={(event) => {
-                event.preventDefault();
-                updateEnrollment(course._id, !course.enrolled);
-              }}
-              className={`btn ${ course.enrolled ? "btn-danger" : "btn-success" } float-end`} >
-                {course.enrolled ? "Unenroll" : "Enroll"}
-              </button>
-            )}
-
                   <Card.Title className="wd-dashboard-course-title text-nowrap overflow-hidden" onClick={() => navigate(`/Kambaz/Courses/${course._id}/Home`)}>
                     {course.name}
                   </Card.Title>
@@ -113,9 +97,9 @@ export default function Dashboard({
                     {course.description}
                   </Card.Text>
 
-                  {/* {isStudentTrue ? (
+                  {isStudentTrue ? (
                     <EnrollmentButtonUpdated courseId={course._id} isEnrolled={(course._id)} currentUser={currentUser} />
-                  ): null} */}
+                  ): null}
 
                   {isFacultyTrue ? (
                     <>

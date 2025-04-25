@@ -7,9 +7,8 @@ body * {  font-family: Arial, Helvetica, sans-serif;  }
   }
 }
 
-.selected {
-    background-color: white !important;
-    color: black !important;
+.wd-dashboard-course {
+    margin-bottom: 20px;
   }
 
   .list-group.wd > .list-group-item.active {
@@ -17,41 +16,36 @@ body * {  font-family: Arial, Helvetica, sans-serif;  }
     background-color: white;
     border-left: 3px solid black !important;
   }
-  .btn-secondary {
-    --bs-btn-color: #000 !important;
-    --bs-btn-bg: #c7cdd1 !important;
-    --bs-btn-border-color: #c7cdd1 !important;
-    --bs-btn-hover-color: #fff !important;
-  }
-  .bg-secondary {
-    --bs-secondary-rgb: 199, 205, 209;
-  }
-  .list-group-item {
-    --bs-list-group-border-color: gray;
-  }
-  .wd-lesson {
-    border-left: 3px solid green !important;
-  }
-  
-  .top-nav {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 50px;
-    padding: 0 15px;
-  }
-  
-  .menu-icon {
-    cursor: pointer;
-    font-size: 24px;
-  }
 
-  @media (max-width: 768px) {
-    #sidebar {
-      transform: translateX(-120px);
-    }
-  
-    #menu-toggle:checked + #sidebar {
-      transform: translateX(0);
-    }
+  .course-modules-buttons {
+  background-color: #e0e0e0 !important; 
+  color: black !important; 
+  border: 1px solid black !important; 
+  font-weight: bold;
   }
+  
+  body { margin: 0;  padding: 0; }
+body * { font-family:
+         Arial, Helvetica, 
+         sans-serif; }
+@media (min-width: 768px) {
+  #wd-kambaz .wd-main-content-offset {
+    padding-left: 140px !important;
+  }
+}
+
+.btn-secondary {
+  --bs-btn-color: #000 !important;
+  --bs-btn-bg: #c7cdd1 !important;
+  --bs-btn-border-color: #c7cdd1 !important;
+  --bs-btn-hover-color: #fff !important;
+}
+.bg-secondary {
+  --bs-secondary-rgb: 199, 205, 209;
+}
+.list-group-item {
+  --bs-list-group-border-color: gray;
+}
+.wd-lesson {
+  border-left: 3px solid green !important;
+}
